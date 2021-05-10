@@ -73,7 +73,11 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { SHOW_SNACKBAR } from "../../store/shared/mutationTypes";
+import {
+  SET_LINES,
+  SET_STATIONS,
+  SHOW_SNACKBAR,
+} from "../../store/shared/mutationTypes";
 import { SNACKBAR_MESSAGES } from "../../utils/constants";
 import SectionCreateButton from "./components/SectionCreateButton";
 import SectionDeleteButton from "./components/SectionDeleteButton";
@@ -82,6 +86,9 @@ export default {
   name: "SectionPage",
   components: { SectionDeleteButton, SectionCreateButton },
   async created() {
+    // TODO 초기 역 데이터를 불러오는 API를 추가해주세요.
+    // const stations = await fetch("/api/stations")
+    // this.setStations([...stations])
     // TODO 초기 노선 데이터를 불러오는 API를 추가해주세요.
     // const lines = await fetch("/api/lines");
     // this.setLines([...lines]);
@@ -98,7 +105,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations([SHOW_SNACKBAR]),
+    ...mapMutations([SHOW_SNACKBAR, SET_STATIONS, SET_LINES]),
     initLinesView() {
       try {
         if (this.lines.length < 1) {
@@ -118,7 +125,7 @@ export default {
     async onChangeLine() {
       try {
         // TODO 선택한 노선 데이터를 불러오는 API를 추가해주세요.
-        // this.activeLine = await fetch("/lines/{id}");
+        // this.activeLine = await fetch("/lines/{this.activeLineId}");
       } catch (e) {
         this.showSnackbar(SNACKBAR_MESSAGES.COMMON.FAIL);
         throw new Error(e);

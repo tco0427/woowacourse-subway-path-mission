@@ -66,7 +66,7 @@ export default {
   },
   async created() {
     // TODO 초기 역 데이터를 불러오는 API를 추가해주세요.
-    const response = await fetch("/api/stations")
+    const response = await fetch("/api/stations");
     if (!response.ok) {
       throw new Error(`${response.status}`);
     }

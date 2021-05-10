@@ -6,7 +6,7 @@
 
 <script>
 import { mapMutations } from "vuex";
-import { SHOW_SNACKBAR } from "../../../store/shared/mutationTypes";
+import { SET_LINES, SHOW_SNACKBAR } from "../../../store/shared/mutationTypes";
 import { SNACKBAR_MESSAGES } from "../../../utils/constants";
 
 export default {
@@ -18,7 +18,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations([SHOW_SNACKBAR]),
+    ...mapMutations([SHOW_SNACKBAR, SET_LINES]),
     async onDeleteLine() {
       try {
         // TODO Line을 삭제하는 API를 추가해주세요.

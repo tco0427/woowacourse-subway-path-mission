@@ -110,7 +110,7 @@ export default {
     async initLineStationsView() {
       try {
         // TODO 선택된 노선의 데이터를 불러와주세요.
-        // this.selectedLine = await fetch('/api/lines')
+        // this.selectedLine = await fetch('/api/lines/{this.sectionForm.lineId}')
         if (this.selectedLine.stations?.length < 1) {
           return;
         }
@@ -129,9 +129,6 @@ export default {
     },
     async initAllStationsView() {
       try {
-        // TODO Station 목록을 불러와주세요.
-        // const stations = await fetch("/api/stations");
-        // this.setStations(stations)
         if (this.stations.length < 1) {
           return;
         }

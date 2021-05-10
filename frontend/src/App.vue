@@ -15,9 +15,6 @@ import Snackbar from "./components/snackbar/Snackbar";
 export default {
   name: "App",
   components: { Snackbar, Header },
-  data() {
-    return {};
-  },
 };
 </script>
 <style lang="scss">

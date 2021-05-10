@@ -78,7 +78,7 @@ import dialog from "../../../mixins/dialog";
 import { mapGetters, mapMutations } from "vuex";
 import Dialog from "../../../components/dialogs/Dialog";
 import { LINE_COLORS, SNACKBAR_MESSAGES } from "../../../utils/constants";
-import { SHOW_SNACKBAR } from "../../../store/shared/mutationTypes";
+import { SET_LINES, SHOW_SNACKBAR } from "../../../store/shared/mutationTypes";
 import validator from "../../../utils/validator";
 import shortid from "shortid";
 
@@ -105,7 +105,7 @@ export default {
     });
   },
   methods: {
-    ...mapMutations([SHOW_SNACKBAR]),
+    ...mapMutations([SHOW_SNACKBAR, SET_LINES]),
     setLineColor(color) {
       this.lineEditForm.color = color;
     },
