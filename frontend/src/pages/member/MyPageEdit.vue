@@ -80,7 +80,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { SHOW_SNACKBAR } from "../../store/shared/mutationTypes";
+import { SET_MEMBER, SHOW_SNACKBAR } from "../../store/shared/mutationTypes";
 import { SNACKBAR_MESSAGES } from "../../utils/constants";
 import validator from "../../utils/validator";
 
@@ -99,7 +99,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations([SHOW_SNACKBAR]),
+    ...mapMutations([SHOW_SNACKBAR, SET_MEMBER]),
     isValid() {
       return this.$refs.memberEditForm.validate();
     },
