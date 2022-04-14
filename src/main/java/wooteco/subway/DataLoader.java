@@ -3,14 +3,12 @@ package wooteco.subway;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import wooteco.subway.line.dao.LineDao;
-import wooteco.subway.line.dao.SectionDao;
-import wooteco.subway.line.domain.Line;
-import wooteco.subway.line.domain.Section;
-import wooteco.subway.member.dao.MemberDao;
-import wooteco.subway.member.domain.Member;
-import wooteco.subway.station.dao.StationDao;
-import wooteco.subway.station.domain.Station;
+import wooteco.subway.dao.LineDao;
+import wooteco.subway.dao.SectionDao;
+import wooteco.subway.domain.Line;
+import wooteco.subway.domain.Section;
+import wooteco.subway.dao.StationDao;
+import wooteco.subway.domain.Station;
 
 @Component
 @Profile("!test")
@@ -18,13 +16,11 @@ public class DataLoader implements CommandLineRunner {
     private StationDao stationDao;
     private LineDao lineDao;
     private SectionDao sectionDao;
-    private MemberDao memberDao;
 
-    public DataLoader(StationDao stationDao, LineDao lineDao, SectionDao sectionDao, MemberDao memberDao) {
+    public DataLoader(StationDao stationDao, LineDao lineDao, SectionDao sectionDao) {
         this.stationDao = stationDao;
         this.lineDao = lineDao;
         this.sectionDao = sectionDao;
-        this.memberDao = memberDao;
     }
 
     @Override
@@ -44,9 +40,6 @@ public class DataLoader implements CommandLineRunner {
         이호선.addSection(new Section(강남역, 역삼역, 10));
         이호선.addSection(new Section(역삼역, 잠실역, 10));
         sectionDao.insertSections(이호선);
-
-        Member member = new Member("email@email.com", "password", 10);
-        memberDao.insert(member);
     }
 }
 

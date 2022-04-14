@@ -24,12 +24,3 @@ create table if not exists SECTION
     foreign key (up_station_id) references station(id),
     foreign key (down_station_id) references station(id)
 );
-
-create table if not exists MEMBER
-(
-    id bigint auto_increment not null,
-    email varchar(255) not null unique,
-    password varchar(255) not null,
-    age int not null,
-    primary key(id)
-);
