@@ -1,4 +1,4 @@
-package wooteco.subway.dao;
+package wooteco.subway.dao.jdbc;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -8,14 +8,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Station;
 
 @Repository
-public class StationDao {
+public class JdbcStationDao implements StationDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public StationDao(JdbcTemplate jdbcTemplate) {
+    public JdbcStationDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -24,6 +25,7 @@ public class StationDao {
             resultSet.getString("name")
     );
 
+    @Override
     public Long save(Station station) {
         String sql = "INSERT INTO station (name) values (?)";
 
@@ -37,18 +39,21 @@ public class StationDao {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
+    @Override
     public Station findById(Long id) {
         String sql = "SELECT * FROM station WHERE id = ?";
 
         return jdbcTemplate.queryForObject(sql, STATION_ROW_MAPPER, id);
     }
 
+    @Override
     public List<Station> findAll() {
         String sql = "SELECT * FROM station";
 
         return jdbcTemplate.query(sql, STATION_ROW_MAPPER);
     }
 
+    @Override
     public int deleteById(Long id) {
         String sql = "DELETE FROM station WHERE id = ?";
 
