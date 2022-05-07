@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 public class StationController {
+
     @PostMapping("/stations")
     public ResponseEntity<StationResponse> createStation(@RequestBody StationRequest stationRequest) {
         Station station = new Station(stationRequest.getName());
@@ -32,7 +33,7 @@ public class StationController {
     }
 
     @DeleteMapping("/stations/{id}")
-    public ResponseEntity deleteStation(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStation(@PathVariable Long id) {
         return ResponseEntity.noContent().build();
     }
 }
