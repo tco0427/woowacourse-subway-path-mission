@@ -100,18 +100,14 @@ public class LineService {
 
     private List<StationResponse> sortedStations(Sections sections) {
         final List<Section> sortedSections = sections.getSections();
+        final List<Station> stations = stationDao.findAllBySection(sortedSections);
 
-        List<StationResponse> stations = new ArrayList<>();
+        List<StationResponse> stationResponses = new ArrayList<>();
 
-        for (final Section section : sortedSections) {
-            final Station findStation = getStationById(section.getUpStationId());
-            stations.add(new StationResponse(findStation));
+        for (Station station : stations) {
+            stationResponses.add(new StationResponse(station));
         }
 
-        final Section lastSection = sortedSections.get(sortedSections.size() - 1);
-        final Station lastStation = getStationById(lastSection.getDownStationId());
-        stations.add(new StationResponse(lastStation));
-
-        return stations;
+        return stationResponses;
     }
 }

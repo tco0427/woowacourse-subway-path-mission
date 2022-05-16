@@ -1,12 +1,17 @@
 package wooteco.subway.service.fake;
 
+import static java.util.stream.Collectors.toList;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.ReflectionUtils;
 import wooteco.subway.dao.StationDao;
+import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
 
 public class FakeStationDao implements StationDao {
@@ -37,6 +42,24 @@ public class FakeStationDao implements StationDao {
     @Override
     public List<Station> findAll() {
         return List.copyOf(stations);
+    }
+
+    @Override
+    public List<Station> findAllBySection(List<Section> sections) {
+        List<Long> stationIds = getStationIds(sections);
+
+        return stations.stream()
+                .filter(station -> stationIds.contains(station.getId()))
+                .collect(toList());
+    }
+
+    private List<Long> getStationIds(List<Section> sections) {
+        Set<Long> stationIds = new TreeSet<>();
+        for (Section section : sections) {
+            stationIds.add(section.getUpStationId());
+            stationIds.add(section.getDownStationId());
+        }
+        return new ArrayList<>(stationIds);
     }
 
     @Override
