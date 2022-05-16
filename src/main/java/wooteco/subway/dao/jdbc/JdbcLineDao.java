@@ -50,7 +50,7 @@ public class JdbcLineDao implements LineDao {
 
         try {
             final Line line = jdbcTemplate.queryForObject(sql, LINE_ROW_MAPPER, id);
-            return Optional.of(line);
+            return Optional.ofNullable(line);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

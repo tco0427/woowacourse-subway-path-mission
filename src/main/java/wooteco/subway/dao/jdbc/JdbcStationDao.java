@@ -51,7 +51,7 @@ public class JdbcStationDao implements StationDao {
         String sql = "SELECT * FROM station WHERE id = ?";
         try {
             final Station station = jdbcTemplate.queryForObject(sql, STATION_ROW_MAPPER, id);
-            return Optional.of(station);
+            return Optional.ofNullable(station);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }

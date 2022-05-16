@@ -86,7 +86,7 @@ public class JdbcSectionDao implements SectionDao {
 
     private List<Object[]> generateParameters(List<Section> sections) {
         return sections.stream()
-                .map(section -> generateParameter(section))
+                .map(this::generateParameter)
                 .collect(toList());
     }
 
