@@ -4,8 +4,8 @@ import java.util.Objects;
 import wooteco.subway.domain.vo.StationName;
 
 public class Station {
-    private Long id;
-    private StationName name;
+    private final Long id;
+    private final StationName name;
 
     public Station(String name) {
         this(null, name);
