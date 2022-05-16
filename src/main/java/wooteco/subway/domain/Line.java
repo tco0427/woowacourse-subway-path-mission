@@ -24,8 +24,8 @@ public class Line {
         if (name.isBlank() || color.isBlank()) {
             throw new IllegalArgumentException("노선의 이름 혹은 색이 공백일 수 없습니다.");
         }
-        if (name.length() >= 255 || color.length() >= 20) {
-            throw new IllegalArgumentException("노선의 이름 혹은 색이 너무 깁니다.");
+        if (name.length() > 255 || color.length() > 20) {
+            throw new IllegalArgumentException("노선의 이름이 255자 보다 크거나, 색이 20자 보다 큽니다.");
         }
     }
 
