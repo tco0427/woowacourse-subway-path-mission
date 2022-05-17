@@ -24,8 +24,8 @@ class PathServiceTest {
 
     @BeforeEach
     void setUp() {
-        FakeSectionDao sectionDao = new FakeSectionDao();
-        FakeStationDao stationDao = new FakeStationDao();
+        final FakeSectionDao sectionDao = new FakeSectionDao();
+        final FakeStationDao stationDao = new FakeStationDao();
         final FakeLineDao lineDao = new FakeLineDao();
 
         pathService = new PathService(stationDao, sectionDao);
@@ -39,19 +39,18 @@ class PathServiceTest {
     @Test
     public void findPath() {
         // given
-        final StationRequest a = new StationRequest("a");
-        final StationRequest b = new StationRequest("b");
-        final StationRequest c = new StationRequest("c");
+        final StationRequest stationRequest1 = new StationRequest("a");
+        final StationRequest stationRequest2 = new StationRequest("b");
+        final StationRequest stationRequest3 = new StationRequest("c");
 
-        final StationResponse response1 = stationService.save(a);
-        final StationResponse response2 = stationService.save(b);
-        final StationResponse response3 = stationService.save(c);
+        final StationResponse stationResponse1 = stationService.save(stationRequest1);
+        final StationResponse stationResponse2 = stationService.save(stationRequest2);
+        final StationResponse stationResponse3 = stationService.save(stationRequest3);
 
-        final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", response1.getId(), response3.getId(), 10);
+        final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", stationResponse1.getId(), stationResponse3.getId(), 10);
         final Long lineId = lineService.save(lineRequest).getId();
 
-        final SectionRequest request = new SectionRequest(response1.getId(), response2.getId(), 4);
-
+        final SectionRequest request = new SectionRequest(stationResponse1.getId(), stationResponse2.getId(), 4);
         sectionService.save(lineId, request);
 
         // when

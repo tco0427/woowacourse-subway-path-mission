@@ -56,7 +56,7 @@ class PathTest {
         assertThat(weight).isEqualTo(5);
     }
 
-    @DisplayName("여러 노선이 존재할 때 구간과 역 정보를 통해 최단 경로를 구할 수 있다.")
+    @DisplayName("여러 노선이 존재할 때 stationId가 랜덤이어도 최단 경로를 구할 수 있다.")
     @Test
     public void getShortestPath3() {
         // given
