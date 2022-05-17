@@ -1,13 +1,10 @@
 package wooteco.subway.dao.jdbc;
 
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,7 +12,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import wooteco.subway.dao.StationDao;
-import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
 
 @Repository
@@ -65,22 +61,12 @@ public class JdbcStationDao implements StationDao {
     }
 
     @Override
-    public List<Station> findAllBySection(List<Section> sections) {
-        List<Long> stationIds = getStationIds(sections);
+    public List<Station> findAllByIds(List<Long> stationIds) {
         final String inSql = String.join(",", Collections.nCopies(stationIds.size(), "?"));
 
         String sql = String.format("SELECT * FROM station WHERE id IN (%s)", inSql);
 
         return jdbcTemplate.query(sql, stationIds.toArray(), STATION_ROW_MAPPER);
-    }
-
-    private List<Long> getStationIds(List<Section> sections) {
-        Set<Long> stationIds = new TreeSet<>();
-        for (Section section : sections) {
-            stationIds.add(section.getUpStationId());
-            stationIds.add(section.getDownStationId());
-        }
-        return new ArrayList<>(stationIds);
     }
 
     @Override

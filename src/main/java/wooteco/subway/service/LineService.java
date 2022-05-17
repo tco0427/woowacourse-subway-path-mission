@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.dao.LineDao;
@@ -99,8 +101,8 @@ public class LineService {
     }
 
     private List<StationResponse> sortedStations(Sections sections) {
-        final List<Section> sortedSections = sections.getSections();
-        final List<Station> stations = stationDao.findAllBySection(sortedSections);
+        final List<Long> stationIds = getStationIds(sections.getSections());
+        final List<Station> stations = stationDao.findAllByIds(stationIds);
 
         List<StationResponse> stationResponses = new ArrayList<>();
 
@@ -109,5 +111,14 @@ public class LineService {
         }
 
         return stationResponses;
+    }
+
+    private List<Long> getStationIds(List<Section> sections) {
+        Set<Long> stationIds = new TreeSet<>();
+        for (Section section : sections) {
+            stationIds.add(section.getUpStationId());
+            stationIds.add(section.getDownStationId());
+        }
+        return new ArrayList<>(stationIds);
     }
 }
