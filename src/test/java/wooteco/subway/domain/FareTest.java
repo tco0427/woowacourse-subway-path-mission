@@ -58,4 +58,30 @@ class FareTest {
         // then
         assertThat(result).isEqualTo(2150);
     }
+
+    @DisplayName("11km는 초과운임이 부과되어 1350원 이다.")
+    @Test
+    public void checkBoundaryTen() {
+        // given
+        final Fare fare = new Fare(11);
+
+        // when
+        final int result = fare.calculate();
+
+        // then
+        assertThat(result).isEqualTo(1350);
+    }
+
+    @DisplayName("51km는 초과운임이 부과되어 2150원 이다.")
+    @Test
+    public void checkBoundaryFifty() {
+        // given
+        final Fare fare = new Fare(51);
+
+        // when
+        final int result = fare.calculate();
+
+        // then
+        assertThat(result).isEqualTo(2150);
+    }
 }
