@@ -12,7 +12,6 @@ public class Sections {
     private List<Section> sections;
 
     public Sections(List<Section> sections) {
-        this.sections = sections;
         this.sections = sortSections(sections);
     }
 
@@ -159,13 +158,13 @@ public class Sections {
 
     private Section findFirstSection(List<Section> copySections) {
         return copySections.stream()
-                .filter(section -> isFirst(section.getUpStationId()))
+                .filter(section -> isFirst(copySections, section.getUpStationId()))
                 .findAny()
                 .orElseThrow();
     }
 
-    private boolean isFirst(Long upStationId) {
-        return sections.stream()
+    private boolean isFirst(List<Section> copySections, Long upStationId) {
+        return copySections.stream()
                 .noneMatch(section -> upStationId.equals(section.getDownStationId()));
     }
 
