@@ -44,8 +44,8 @@ class PathServiceTest {
         final StationRequest stationRequest3 = new StationRequest("c");
 
         final StationResponse stationResponse1 = stationService.save(stationRequest1);
-        final StationResponse stationResponse2 = stationService.save(stationRequest2);
         final StationResponse stationResponse3 = stationService.save(stationRequest3);
+        final StationResponse stationResponse2 = stationService.save(stationRequest2);
 
         final LineRequest lineRequest = new LineRequest("신분당선", "bg-red-600", stationResponse1.getId(), stationResponse3.getId(), 10);
         final Long lineId = lineService.save(lineRequest).getId();

@@ -10,6 +10,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.ReflectionUtils;
 import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Station;
+import wooteco.subway.exception.NotExistException;
 
 public class FakeStationDao implements StationDao {
 
@@ -43,8 +44,8 @@ public class FakeStationDao implements StationDao {
 
     @Override
     public List<Station> findAllByIds(List<Long> stationIds) {
-        return stations.stream()
-                .filter(station -> stationIds.contains(station.getId()))
+        return stationIds.stream().sequential()
+                .map(id -> findById(id).orElseThrow(() -> new NotExistException("존재하지 않는 지하철 역입니다.")))
                 .collect(toList());
     }
 

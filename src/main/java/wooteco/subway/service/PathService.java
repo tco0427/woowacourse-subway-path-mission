@@ -2,6 +2,7 @@ package wooteco.subway.service;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
 import wooteco.subway.dto.PathResponse;
 import wooteco.subway.dto.StationResponse;
+import wooteco.subway.exception.NotExistException;
 
 @Service
 @Transactional
@@ -40,9 +42,18 @@ public class PathService {
     }
 
     private List<StationResponse> getStationResponses(List<Long> shortestPath) {
-        final List<Station> stations = stationDao.findAllByIds(shortestPath);
-        return stations.stream()
+        final List<Station> stations = new ArrayList<>();
+        for (Long id : shortestPath) {
+            stations.add(findStation(id));
+        }
+
+        return stations.stream().sequential()
                 .map(StationResponse::new)
                 .collect(toList());
+    }
+
+    private Station findStation(Long id) {
+        return stationDao.findById(id)
+                .orElseThrow(() -> new NotExistException("찾으려는 역이 존재하지 않습니다."));
     }
 }
