@@ -21,7 +21,6 @@ public class PathService {
     private final StationDao stationDao;
     private final SectionDao sectionDao;
 
-
     public PathService(StationDao stationDao, SectionDao sectionDao) {
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;

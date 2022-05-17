@@ -11,7 +11,6 @@ public class Fare {
         this.distance = distance;
     }
 
-
     public int calculate() {
         if (distance <= 10) {
             return BASIC_FARE;
