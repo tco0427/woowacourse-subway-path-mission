@@ -54,7 +54,7 @@ class PathServiceTest {
         sectionService.save(lineId, request);
 
         // when
-        final PathResponse response = pathService.findPath(1L, 3L);
+        final PathResponse response = pathService.findPath(stationResponse1.getId(), stationResponse3.getId());
 
         // then
         assertThat(response).extracting("distance", "fare")
@@ -62,9 +62,9 @@ class PathServiceTest {
         assertThat(response.getStations()).hasSize(3)
                 .extracting("id", "name")
                 .containsExactly(
-                        tuple(1L, "a"),
-                        tuple(2L, "b"),
-                        tuple(3L, "c")
+                        tuple(stationResponse1.getId(), "a"),
+                        tuple(stationResponse2.getId(), "b"),
+                        tuple(stationResponse3.getId(), "c")
                 );
     }
 }
