@@ -9,9 +9,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import wooteco.subway.domain.Station;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.LineResponse;
+import wooteco.subway.dto.StationRequest;
+import wooteco.subway.dto.StationResponse;
 import wooteco.subway.exception.NotExistException;
 import wooteco.subway.service.fake.FakeLineDao;
 import wooteco.subway.service.fake.FakeSectionDao;
@@ -20,25 +21,26 @@ import wooteco.subway.service.fake.FakeStationDao;
 class LineServiceTest {
 
     private LineService lineService;
-    private static FakeLineDao lineDao = new FakeLineDao();
-    private static FakeSectionDao sectionDao = new FakeSectionDao();
-    private static FakeStationDao stationDao = new FakeStationDao();
+    private StationService stationService;
 
     @BeforeEach
     void setUp() {
-        lineDao = new FakeLineDao();
-        sectionDao = new FakeSectionDao();
-        stationDao = new FakeStationDao();
+        FakeLineDao lineDao = new FakeLineDao();
+        FakeSectionDao sectionDao = new FakeSectionDao();
+        FakeStationDao stationDao = new FakeStationDao();
 
         lineService = new LineService(lineDao, sectionDao, stationDao);
+        stationService = new StationService(stationDao, sectionDao);
     }
 
     @Test
     @DisplayName("노선을 저장할 수 있다.")
     void save() {
         // given
-        final Long upStationId = stationDao.save(new Station("지하철역"));
-        final Long downStationId = stationDao.save(new Station("새로운지하철역"));
+        final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
+        final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+        final Long upStationId = upStationResponse.getId();
+        final Long downStationId = downStationResponse.getId();
 
         LineRequest request = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
 
@@ -60,9 +62,12 @@ class LineServiceTest {
     @DisplayName("전체 노선을 조회할 수 있다.")
     void findAll() {
         // given
-        final Long upStationId = stationDao.save(new Station("지하철역"));
-        final Long downStationId = stationDao.save(new Station("새로운지하철역"));
-        final Long anotherDownStationId = stationDao.save(new Station("또다른지하철역"));
+        final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
+        final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+        final StationResponse anotherDownStationResponse = stationService.save(new StationRequest("또다른지하철역"));
+        final Long upStationId = upStationResponse.getId();
+        final Long downStationId = downStationResponse.getId();
+        final Long anotherDownStationId = anotherDownStationResponse.getId();
 
         LineRequest request1 = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
         LineRequest request2 = new LineRequest("분당선", "bg-green-600", upStationId, anotherDownStationId, 10);
@@ -98,8 +103,10 @@ class LineServiceTest {
     @DisplayName("기존 노선의 이름과 색상을 변경할 수 있다.")
     void updateById() {
         // given
-        final Long upStationId = stationDao.save(new Station("지하철역"));
-        final Long downStationId = stationDao.save(new Station("새로운지하철역"));
+        final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
+        final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+        final Long upStationId = upStationResponse.getId();
+        final Long downStationId = downStationResponse.getId();
 
         // given
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
@@ -119,8 +126,10 @@ class LineServiceTest {
     @DisplayName("노선을 삭제할 수 있다.")
     void deleteById() {
         // given
-        final Long upStationId = stationDao.save(new Station("지하철역"));
-        final Long downStationId = stationDao.save(new Station("새로운지하철역"));
+        final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
+        final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+        final Long upStationId = upStationResponse.getId();
+        final Long downStationId = downStationResponse.getId();
 
         LineRequest request = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
         final LineResponse savedResponse = lineService.save(request);
@@ -133,8 +142,10 @@ class LineServiceTest {
     @Test
     public void findByNotExistId() {
         // given
-        final Long upStationId = stationDao.save(new Station("지하철역"));
-        final Long downStationId = stationDao.save(new Station("새로운지하철역"));
+        final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
+        final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+        final Long upStationId = upStationResponse.getId();
+        final Long downStationId = downStationResponse.getId();
 
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
         final LineResponse savedResponse = lineService.save(request);
