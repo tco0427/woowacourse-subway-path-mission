@@ -10,7 +10,8 @@ import org.jgrapht.graph.WeightedMultigraph;
 
 public class Path {
 
-    private final WeightedMultigraph<Long, DefaultWeightedEdge> graph = new WeightedMultigraph<>(DefaultWeightedEdge.class);
+    private final WeightedMultigraph<Long, DefaultWeightedEdge> graph = new WeightedMultigraph<>(
+            DefaultWeightedEdge.class);
 
     public Path(List<Section> sections) {
         final List<Long> stationIds = getStationIds(sections);
@@ -42,9 +43,13 @@ public class Path {
         }
     }
 
-
     public List<Long> getShortestPath(Long sourceId, Long targetId) {
         DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
         return dijkstraShortestPath.getPath(sourceId, targetId).getVertexList();
+    }
+
+    public int getShortestPathWeight(Long sourceId, Long targetId) {
+        DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        return (int) dijkstraShortestPath.getPath(sourceId, targetId).getWeight();
     }
 }

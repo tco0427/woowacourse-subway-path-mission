@@ -23,9 +23,11 @@ class PathTest {
 
         // when
         List<Long> shortestPath = path.getShortestPath(1L, 5L);
+        final int weight = path.getShortestPathWeight(1L, 5L);
 
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 5L);
+        assertThat(weight).isEqualTo(14);
     }
 
     @DisplayName("여러 노선이 존재할 때 구간과 역 정보를 통해 최단 경로를 구할 수 있다.")
@@ -47,8 +49,10 @@ class PathTest {
 
         // when
         List<Long> shortestPath = path.getShortestPath(1L, 7L);
+        final int weight = path.getShortestPathWeight(1L, 7L);
 
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 6L, 7L);
+        assertThat(weight).isEqualTo(5);
     }
 }
