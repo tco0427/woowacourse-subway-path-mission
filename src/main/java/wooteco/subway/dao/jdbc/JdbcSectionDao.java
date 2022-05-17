@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -43,7 +44,7 @@ public class JdbcSectionDao implements SectionDao {
             return statement;
         }, keyHolder);
 
-        final long id = keyHolder.getKey().longValue();
+        final Long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
 
         return new Section(id, section.getLineId(), section.getUpStationId(), section.getDownStationId(), section.getDistance());
     }

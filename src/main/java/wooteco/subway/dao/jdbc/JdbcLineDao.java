@@ -2,6 +2,7 @@ package wooteco.subway.dao.jdbc;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -39,7 +40,7 @@ public class JdbcLineDao implements LineDao {
             return statement;
         }, keyHolder);
 
-        final long id = keyHolder.getKey().longValue();
+        final Long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
 
         return new Line(id, line.getName(), line.getColor());
     }
