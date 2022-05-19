@@ -2,8 +2,8 @@ package wooteco.subway.domain;
 
 public class Fare {
 
-    public static final int BASIC_FARE = 1250;
-    public static final int ADDITIONAL_FARE = 100;
+    private static final int BASIC_FARE = 1250;
+    private static final int ADDITIONAL_FARE = 100;
     private static final int SECOND_ADDITIONAL_FARE = 800;
     private static final int BASIC_DISTANCE = 10;
     private static final int SURCHARGE_BOUNDARY = 50;
