@@ -21,7 +21,9 @@ public class FakeStationDao implements StationDao {
 
     @Override
     public Long save(Station station) {
-        if (stations.contains(station)) {
+        final List<String> names = getNaems();
+
+        if (names.contains(station.getName())) {
             throw new DuplicateKeyException("동일한 station이 존재합니다.");
         }
 
@@ -65,5 +67,11 @@ public class FakeStationDao implements StationDao {
         field.setAccessible(true);
         ReflectionUtils.setField(field, station, ++seq);
         return station;
+    }
+
+    private List<String> getNaems() {
+        return stations.stream()
+                .map(Station::getName)
+                .collect(toList());
     }
 }

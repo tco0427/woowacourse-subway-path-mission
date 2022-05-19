@@ -1,5 +1,7 @@
 package wooteco.subway.service.fake;
 
+import static java.util.stream.Collectors.toList;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,9 @@ public class FakeLineDao implements LineDao {
 
     @Override
     public Line save(Line line) {
-        if (lines.contains(line)) {
+        final List<String> names = getNames();
+
+        if (names.contains(line.getName())) {
             throw new DuplicateKeyException("동일한 line이 존재합니다.");
         }
 
@@ -67,5 +71,11 @@ public class FakeLineDao implements LineDao {
         field.setAccessible(true);
         ReflectionUtils.setField(field, line, ++seq);
         return line;
+    }
+
+    private List<String> getNames() {
+        return lines.stream()
+                .map(Line::getName)
+                .collect(toList());
     }
 }

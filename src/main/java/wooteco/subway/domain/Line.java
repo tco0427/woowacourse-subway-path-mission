@@ -37,15 +37,15 @@ public class Line {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Line)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         Line line = (Line) o;
-        return Objects.equals(name, line.name) && Objects.equals(color, line.color);
+        return Objects.equals(id, line.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, color);
+        return Objects.hash(id);
     }
 }

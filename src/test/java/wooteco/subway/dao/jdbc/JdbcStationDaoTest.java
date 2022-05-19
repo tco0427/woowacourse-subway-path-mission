@@ -36,7 +36,7 @@ class JdbcStationDaoTest {
         final Station savedStation = jdbcStationDao.findById(savedId)
                 .orElseGet(() -> new Station(FAIL_FIND_STATION));
 
-        assertThat(station).isEqualTo(savedStation);
+        assertThat(station.getName()).isEqualTo(savedStation.getName());
     }
 
     @Test
