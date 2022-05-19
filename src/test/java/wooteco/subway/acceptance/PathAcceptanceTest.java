@@ -57,8 +57,9 @@ public class PathAcceptanceTest extends AcceptanceTest {
         // given
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
+        final int distance = 10;
 
-        registerLine(sourceStationId, targetStationId);
+        registerLine(sourceStationId, targetStationId, distance);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -79,7 +80,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
 
-        registerLine(sourceStationId, targetStationId);
+        registerLine(sourceStationId, targetStationId, distance);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -100,7 +101,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
 
-        registerLine(sourceStationId, targetStationId);
+        registerLine(sourceStationId, targetStationId, distance);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -113,8 +114,8 @@ public class PathAcceptanceTest extends AcceptanceTest {
         assertThat(pathResponse.getFare()).isEqualTo(2150);
     }
 
-    private void registerLine(Long sourceStationId, Long targetStationId) {
-        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, 10);
+    private void registerLine(Long sourceStationId, Long targetStationId, int distance) {
+        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, distance);
         AcceptanceFixture.post(params, "/lines");
     }
 
