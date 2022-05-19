@@ -25,9 +25,9 @@ class LineServiceTest {
 
     @BeforeEach
     void setUp() {
-        FakeLineDao lineDao = new FakeLineDao();
-        FakeSectionDao sectionDao = new FakeSectionDao();
-        FakeStationDao stationDao = new FakeStationDao();
+        final FakeLineDao lineDao = new FakeLineDao();
+        final FakeSectionDao sectionDao = new FakeSectionDao();
+        final FakeStationDao stationDao = new FakeStationDao();
 
         lineService = new LineService(lineDao, sectionDao, stationDao);
         stationService = new StationService(stationDao, sectionDao);
@@ -39,6 +39,7 @@ class LineServiceTest {
         // given
         final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
         final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+
         final Long upStationId = upStationResponse.getId();
         final Long downStationId = downStationResponse.getId();
 
@@ -65,6 +66,7 @@ class LineServiceTest {
         final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
         final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
         final StationResponse anotherDownStationResponse = stationService.save(new StationRequest("또다른지하철역"));
+
         final Long upStationId = upStationResponse.getId();
         final Long downStationId = downStationResponse.getId();
         final Long anotherDownStationId = anotherDownStationResponse.getId();
@@ -105,10 +107,10 @@ class LineServiceTest {
         // given
         final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
         final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+
         final Long upStationId = upStationResponse.getId();
         final Long downStationId = downStationResponse.getId();
 
-        // given
         final LineRequest request = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
         final LineResponse savedResponse = lineService.save(request);
 
@@ -128,6 +130,7 @@ class LineServiceTest {
         // given
         final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
         final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+
         final Long upStationId = upStationResponse.getId();
         final Long downStationId = downStationResponse.getId();
 
@@ -144,6 +147,7 @@ class LineServiceTest {
         // given
         final StationResponse upStationResponse = stationService.save(new StationRequest("지하철역"));
         final StationResponse downStationResponse = stationService.save(new StationRequest("새로운지하철역"));
+
         final Long upStationId = upStationResponse.getId();
         final Long downStationId = downStationResponse.getId();
 

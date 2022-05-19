@@ -84,13 +84,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("노선 id 값을 통해서 노선을 조회한다.")
     void getLine() {
         // given
-        final Long upStationId = extractIdByStationName("지하철역");
-        final Long downStationId = extractIdByStationName("새로운지하철역");
-
-        final LineRequest params = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
-
-        ExtractableResponse<Response> param = AcceptanceFixture.post(params, "/lines");
-        final String savedId = param.header("Location").split("/")[2];
+        final String savedId = getSavedIdFromInitLine();
 
         // when
         ExtractableResponse<Response> response = AcceptanceFixture.get("/lines/" + savedId);
@@ -108,13 +102,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("기존 노선의 이름과 색상을 변경할 수 있다.")
     void updateById() {
         // given
-        final Long upStationId = extractIdByStationName("지하철역");
-        final Long downStationId = extractIdByStationName("새로운지하철역");
-
-        final LineRequest params = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
-
-        ExtractableResponse<Response> param = AcceptanceFixture.post(params, "/lines");
-        final String savedId = param.header("Location").split("/")[2];
+        final String savedId = getSavedIdFromInitLine();
 
         // when
         Map<String, String> updateParams = new HashMap<>();
@@ -131,19 +119,23 @@ class LineAcceptanceTest extends AcceptanceTest {
     @DisplayName("기존 노선을 삭제할 수 있다.")
     void deleteById() {
         // given
-        final Long upStationId = extractIdByStationName("지하철역");
-        final Long downStationId = extractIdByStationName("새로운지하철역");
-
-        final LineRequest params = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
-
-        ExtractableResponse<Response> param = AcceptanceFixture.post(params, "/lines");
-        final String savedId = param.header("Location").split("/")[2];
+        final String savedId = getSavedIdFromInitLine();
 
         // when
         ExtractableResponse<Response> response = AcceptanceFixture.delete("/lines/" + savedId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+    }
+
+    private String getSavedIdFromInitLine() {
+        final Long upStationId = extractIdByStationName("지하철역");
+        final Long downStationId = extractIdByStationName("새로운지하철역");
+
+        final LineRequest params = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
+        final ExtractableResponse<Response> param = AcceptanceFixture.post(params, "/lines");
+
+        return param.header("Location").split("/")[2];
     }
 
     private Long extractId(ExtractableResponse<Response> response) {

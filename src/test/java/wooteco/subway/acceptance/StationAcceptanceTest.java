@@ -70,7 +70,6 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void deleteStation() {
         // given
         final StationRequest params = new StationRequest("강남역");
-
         ExtractableResponse<Response> createResponse = AcceptanceFixture.post(params, "/stations");
 
         // when
