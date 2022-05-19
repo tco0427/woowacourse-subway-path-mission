@@ -28,8 +28,9 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long lineId1 = extractId(response1);
 
         SectionRequest sectionRequest1 = new SectionRequest(stationId2, stationId3, 5);
-        ExtractableResponse<Response> sectionResponse1 = AcceptanceFixture.post(sectionRequest1, "/lines/" + lineId1 + "/sections");
+        AcceptanceFixture.post(sectionRequest1, "/lines/" + lineId1 + "/sections");
 
+        // when
         final Long stationId4 = extractStationIdFromName("신사역");
         final Long stationId5 = extractStationIdFromName("양재역");
 
@@ -38,11 +39,10 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         Long lineId2 = extractId(response2);
 
         SectionRequest sectionRequest2 = new SectionRequest(stationId2, stationId5, 5);
-        ExtractableResponse<Response> sectionResponse2 = AcceptanceFixture.post(sectionRequest2, "/lines/" + lineId2 + "/sections");
+        ExtractableResponse<Response> sectionResponse = AcceptanceFixture.post(sectionRequest2, "/lines/" + lineId2 + "/sections");
 
-        //when & then
-        assertThat(sectionResponse1.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(sectionResponse2.statusCode()).isEqualTo(HttpStatus.OK.value());
+        //then
+        assertThat(sectionResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
     
     @DisplayName("갈래길을 방지하여 구간을 등록한다.")
@@ -95,8 +95,8 @@ public class SectionAcceptanceTest extends AcceptanceTest {
         assertThat(result.as(LineResponse.class).getName()).isEqualTo("2호선");
         assertThat(result.as(LineResponse.class).getColor()).isEqualTo("bg-red-600");
         assertThat(result.as(LineResponse.class).getStations()).hasSize(2)
-                .extracting("name")
-                .containsExactly("교대역", "역삼역");
+                    .extracting("name")
+                    .containsExactly("교대역", "역삼역");
     }
 
     private Long extractId(ExtractableResponse<Response> response) {
