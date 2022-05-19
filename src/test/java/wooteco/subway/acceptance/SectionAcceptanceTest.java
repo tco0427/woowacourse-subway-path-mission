@@ -71,7 +71,7 @@ public class SectionAcceptanceTest extends AcceptanceTest {
                 .containsExactly("교대역", "강남역", "역삼역");
     }
 
-    @DisplayName("구간을 제거할 수 있다.")
+    @DisplayName("노선과 구간 정보를 이용하여 구간을 제거할 수 있다.")
     @Test
     public void deleteSection() {
         // given

@@ -17,7 +17,7 @@ import wooteco.subway.dto.StationResponse;
 
 public class PathAcceptanceTest extends AcceptanceTest {
 
-    @DisplayName("경로를 조회할 수 있다.")
+    @DisplayName("출발역과 도착역을 기반으로 최단 경로를 조회할 수 있다.")
     @Test
     public void findPath() {
         // given

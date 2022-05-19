@@ -20,7 +20,7 @@ import wooteco.subway.dto.StationResponse;
 class LineAcceptanceTest extends AcceptanceTest {
 
     @Test
-    @DisplayName("노선을 등록한다.")
+    @DisplayName("새로운 노선 요청이 오면 노선을 등록한다.")
     void createLine() {
         // given
         final Long upStationId = extractIdByStationName("지하철역");
@@ -39,7 +39,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("기존에 존재하는 노선 이름으로 노선을 생성한다.")
+    @DisplayName("기존에 존재하는 노선 이름으로 노선을 생성하면 생성에 실패한다.")
     void createLineWithDuplicateName() {
         // given
         final Long upStationId = extractIdByStationName("지하철역");
@@ -56,7 +56,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선 전체를 조회한다.")
+    @DisplayName("노선 전체를 조회하면 노선 리스트가 결과로 반환된다.")
     void getLines() {
         // given
         final Long upStationId = extractIdByStationName("지하철역");
@@ -81,7 +81,7 @@ class LineAcceptanceTest extends AcceptanceTest {
     }
 
     @Test
-    @DisplayName("노선 id값을 통해서 노선을 조회한다.")
+    @DisplayName("노선 id 값을 통해서 노선을 조회한다.")
     void getLine() {
         // given
         final Long upStationId = extractIdByStationName("지하철역");

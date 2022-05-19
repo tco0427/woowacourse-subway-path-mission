@@ -35,7 +35,7 @@ class PathServiceTest {
     }
 
 
-    @DisplayName("경로를 조회할 수 있다.")
+    @DisplayName("출발역과 도착역의 id로 최단 경로를 조회할 수 있다.")
     @Test
     public void findPath() {
         // given

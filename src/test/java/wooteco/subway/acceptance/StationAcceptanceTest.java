@@ -30,7 +30,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.as(StationResponse.class).getName()).isEqualTo("강남역");
     }
 
-    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성한다.")
+    @DisplayName("기존에 존재하는 지하철역 이름으로 지하철역을 생성하면 생성에 실패한다.")
     @Test
     void createStationWithDuplicateName() {
         // given
@@ -44,7 +44,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 
-    @DisplayName("지하철역을 조회한다.")
+    @DisplayName("지하철역들을 조회하면 지하철역 리스트가 반환된다.")
     @Test
     void getStations() {
         /// given
