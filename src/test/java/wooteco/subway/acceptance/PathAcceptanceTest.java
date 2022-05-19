@@ -7,6 +7,8 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.LineResponse;
@@ -36,10 +38,10 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
                 "/paths?source=" + stationId1 + "&target=" + stationId3 + "&age=15");
 
-        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
-
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
         assertThat(pathResponse.getStations()).hasSize(3)
                 .extracting("id", "name")
                 .containsExactly(
@@ -47,6 +49,71 @@ public class PathAcceptanceTest extends AcceptanceTest {
                         tuple(stationId2, "강남역"),
                         tuple(stationId3, "역삼역")
                 );
+    }
+
+    @DisplayName("10km 이내는 기본운임인 1250원을 부과한다.")
+    @Test
+    public void testFareWhen10km() {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("역삼역");
+
+        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, 10);
+        AcceptanceFixture.post(params, "/lines");
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=15");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(1250);
+    }
+
+    @DisplayName("10km ~ 50km 사이는 5km 마다 100원이 추가된다.")
+    @ParameterizedTest
+    @ValueSource(ints = {11, 12, 13, 14, 15})
+    public void testAdditionalFare(int distance) {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("역삼역");
+
+        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, distance);
+        AcceptanceFixture.post(params, "/lines");
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=15");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(1350);
+    }
+
+    @DisplayName("운행 거리가 50km 초과인 경우 8km 마다 100원이 추가된다.")
+    @ParameterizedTest
+    @ValueSource(ints = {51, 52, 53, 54, 55, 56, 57, 58})
+    public void testFareWhenOver50km(int distance) {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("역삼역");
+
+        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, distance);
+        AcceptanceFixture.post(params, "/lines");
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=15");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(2150);
     }
 
     private Long extractId(ExtractableResponse<Response> response) {
