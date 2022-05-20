@@ -9,15 +9,25 @@ public class Line {
     private final Long id;
     private final Name name;
     private final LineColor color;
+    private final Integer extraFare;
 
     public Line(String name, String color) {
         this(null, name, color);
     }
 
+    public Line(String name, String color, Integer extraFare) {
+        this(null, name, color, extraFare);
+    }
+
     public Line(Long id, String name, String color) {
+        this(id, name, color, null);
+    }
+
+    public Line(Long id, String name, String color, Integer extraFare) {
         this.id = id;
         this.name = Name.of(name);
         this.color = LineColor.of(color);
+        this.extraFare = extraFare;
     }
 
     public Long getId() {
@@ -30,6 +40,10 @@ public class Line {
 
     public String getColor() {
         return color.getColor();
+    }
+
+    public Integer getExtraFare() {
+        return extraFare;
     }
 
     @Override
