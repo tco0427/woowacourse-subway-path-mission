@@ -9,6 +9,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class FareTest {
 
+    private static final int NO_DISCOUNT_AGE = 20;
+    private static final int EXTRA_COST = 500;
+
     @DisplayName("기본 운임(10km 이내) 요금을 확인한다.")
     @Test
     public void chargeDefaultFare() {
@@ -62,5 +65,44 @@ class FareTest {
 
         // then
         assertThat(result).isEqualTo(2150);
+    }
+    
+    @DisplayName("추가 요금이 있는 노선을 이용 할 경우 측정된 요금에 추가된다.")
+    @Test
+    public void testAdditionalFareWithLine() {
+        // given
+        final Fare fare = new Fare(10, EXTRA_COST, NO_DISCOUNT_AGE);
+
+        // when
+        final int result = fare.calculate();
+
+        // then
+        assertThat(result).isEqualTo(1250 + EXTRA_COST);
+    }
+
+    @DisplayName("어린이는 350원을 공제한 금액의 50%를 할인받는다.")
+    @Test
+    public void childrenFare() {
+        // given
+        final Fare fare = new Fare(10, 0, 6);
+
+        // when
+        final int result = fare.calculate();
+
+        // then
+        assertThat(result).isEqualTo(800);
+    }
+
+    @DisplayName("청소년은 350원을 공제한 금액의 20%를 할인받는다.")
+    @Test
+    public void teenagerFare() {
+        // given
+        final Fare fare = new Fare(10, 0, 13);
+
+        // when
+        final int result = fare.calculate();
+
+        // then
+        assertThat(result).isEqualTo(1070);
     }
 }
