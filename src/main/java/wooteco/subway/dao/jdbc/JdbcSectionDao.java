@@ -3,6 +3,8 @@ package wooteco.subway.dao.jdbc;
 import static java.util.stream.Collectors.toList;
 
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -63,6 +65,16 @@ public class JdbcSectionDao implements SectionDao {
         return jdbcTemplate.query(sql, SECTION_ROW_MAPPER, id);
     }
 
+    public List<Section> findAllByStationIds(List<Long> stationIds) {
+        List<Long> parameters = makeParameters(stationIds);
+
+        final String inSql = String.join(",", Collections.nCopies(stationIds.size(), "?"));
+        final String sql = String.format(
+                "SELECT * FROM section WHERE up_station_id IN (%S) OR down_station_id IN (%S)", inSql, inSql);
+
+        return jdbcTemplate.query(sql, parameters.toArray(), SECTION_ROW_MAPPER);
+    }
+
     @Override
     public List<Section> findAll() {
         final String sql = "SELECT * FROM `section`";
@@ -98,5 +110,12 @@ public class JdbcSectionDao implements SectionDao {
                 section.getDownStationId(),
                 section.getDistance()
         };
+    }
+
+    private List<Long> makeParameters(List<Long> stationIds) {
+        List<Long> parameters = new ArrayList<>();
+        parameters.addAll(stationIds);
+        parameters.addAll(stationIds);
+        return parameters;
     }
 }

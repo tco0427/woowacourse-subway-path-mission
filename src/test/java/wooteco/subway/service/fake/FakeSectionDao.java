@@ -38,6 +38,13 @@ public class FakeSectionDao implements SectionDao {
     }
 
     @Override
+    public List<Section> findAllByStationIds(List<Long> stationIds) {
+        return sections.stream()
+                .filter(section -> stationIds.contains(section.getUpStationId()) || stationIds.contains(section.getDownStationId()))
+                .collect(toList());
+    }
+
+    @Override
     public List<Section> findAll() {
         return sections;
     }
