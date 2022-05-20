@@ -4,12 +4,15 @@ import static java.util.stream.Collectors.toList;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.util.ReflectionUtils;
 import wooteco.subway.dao.LineDao;
 import wooteco.subway.domain.Line;
+import wooteco.subway.domain.Section;
 
 public class FakeLineDao implements LineDao {
 
@@ -36,6 +39,16 @@ public class FakeLineDao implements LineDao {
         return lines.stream()
                 .filter(line -> line.getId().equals(id))
                 .findAny();
+    }
+
+    @Override
+    public List<Line> findAllBySections(List<Section> sections) {
+        Set<Long> stationIds = new HashSet<>();
+        setStationIds(sections, stationIds);
+
+        return lines.stream()
+                .filter(line -> stationIds.contains(line.getId()))
+                .collect(toList());
     }
 
     @Override
@@ -76,6 +89,26 @@ public class FakeLineDao implements LineDao {
     private List<String> getNames() {
         return lines.stream()
                 .map(Line::getName)
+                .collect(toList());
+    }
+
+    private void setStationIds(List<Section> sections, Set<Long> stationIds) {
+        final List<Long> upStationIds = getUpStationIds(sections);
+        final List<Long> downStationIds = getDownStationIds(sections);
+
+        stationIds.addAll(upStationIds);
+        stationIds.addAll(downStationIds);
+    }
+
+    private List<Long> getUpStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(Section::getUpStationId)
+                .collect(toList());
+    }
+
+    private List<Long> getDownStationIds(List<Section> sections) {
+        return sections.stream()
+                .map(Section::getDownStationId)
                 .collect(toList());
     }
 }

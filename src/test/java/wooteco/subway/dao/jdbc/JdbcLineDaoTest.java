@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import wooteco.subway.domain.Line;
+import wooteco.subway.domain.Section;
 
 @JdbcTest
 class JdbcLineDaoTest {
@@ -103,5 +104,29 @@ class JdbcLineDaoTest {
 
         // when & then
         assertDoesNotThrow(() -> jdbcLineDao.deleteById(savedLine.getId()));
+    }
+
+    @DisplayName("구간들을 통해서 노선을 구할 수 있다.")
+    @Test
+    public void findAllBySections() {
+        // given
+        final Long lineId1 = jdbcLineDao.save(new Line("분당선", "bg-green-600")).getId();
+        final Long lineId2 = jdbcLineDao.save(new Line("신분당선", "bg-red-600")).getId();
+        final Long lineId3 = jdbcLineDao.save(new Line("다른분당선", "bg-red-600")).getId();
+
+        final List<Section> sampleSections = List.of(
+                new Section(1L, lineId1, 1L, 2L, 10),
+                new Section(2L, lineId1, 2L, 3L, 10),
+                new Section(3L, lineId2, 2L, 4L, 10),
+                new Section(4L, lineId3, 5L, 6L, 10)
+        );
+
+        // when
+        final List<Line> lines = jdbcLineDao.findAllBySections(sampleSections);
+
+        // then
+        assertThat(lines).hasSize(3)
+                .extracting("id")
+                .contains(lineId1, lineId2, lineId3);
     }
 }
