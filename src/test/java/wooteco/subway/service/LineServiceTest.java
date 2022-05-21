@@ -6,31 +6,28 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.LineResponse;
 import wooteco.subway.dto.StationRequest;
 import wooteco.subway.dto.StationResponse;
 import wooteco.subway.exception.NotExistException;
-import wooteco.subway.service.fake.FakeLineDao;
-import wooteco.subway.service.fake.FakeSectionDao;
-import wooteco.subway.service.fake.FakeStationDao;
 
+@SpringBootTest
+@Sql("/truncate.sql")
 class LineServiceTest {
 
-    private LineService lineService;
-    private StationService stationService;
+    private final LineService lineService;
+    private final StationService stationService;
 
-    @BeforeEach
-    void setUp() {
-        final FakeLineDao lineDao = new FakeLineDao();
-        final FakeSectionDao sectionDao = new FakeSectionDao();
-        final FakeStationDao stationDao = new FakeStationDao();
-
-        lineService = new LineService(lineDao, sectionDao, stationDao);
-        stationService = new StationService(stationDao, sectionDao);
+    @Autowired
+    public LineServiceTest(LineService lineService, StationService stationService) {
+        this.lineService = lineService;
+        this.stationService = stationService;
     }
 
     @Test

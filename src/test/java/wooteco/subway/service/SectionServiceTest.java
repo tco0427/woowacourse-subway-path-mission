@@ -2,31 +2,29 @@ package wooteco.subway.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.SectionRequest;
 import wooteco.subway.dto.StationRequest;
 import wooteco.subway.dto.StationResponse;
-import wooteco.subway.service.fake.FakeLineDao;
-import wooteco.subway.service.fake.FakeSectionDao;
-import wooteco.subway.service.fake.FakeStationDao;
 
+@SpringBootTest
+@Sql("/truncate.sql")
 class SectionServiceTest {
 
-    private SectionService sectionService;
-    private LineService lineService;
-    private StationService stationService;
+    private final SectionService sectionService;
+    private final LineService lineService;
+    private final StationService stationService;
 
-    @BeforeEach
-    void setUp() {
-        final FakeSectionDao fakeSectionDao = new FakeSectionDao();
-        final FakeStationDao fakeStationDao = new FakeStationDao();
-
-        sectionService = new SectionService(fakeSectionDao);
-        lineService = new LineService(new FakeLineDao(), fakeSectionDao, fakeStationDao);
-        stationService = new StationService(fakeStationDao, fakeSectionDao);
+    @Autowired
+    public SectionServiceTest(SectionService sectionService, LineService lineService, StationService stationService) {
+        this.sectionService =sectionService;
+        this.lineService = lineService;
+        this.stationService = stationService;
     }
 
     @DisplayName("구간을 등록할 수 있다.")

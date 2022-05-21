@@ -37,7 +37,7 @@ public class LineService {
     }
 
     public LineResponse save(LineRequest request) {
-        Line line = new Line(request.getName(), request.getColor());
+        Line line = new Line(request.getName(), request.getColor(), request.getExtraFare());
         final Line savedLine = lineDao.save(line);
 
         final Section section = new Section(savedLine.getId(), request.getUpStationId(), request.getDownStationId(),

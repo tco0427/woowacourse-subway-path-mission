@@ -9,21 +9,21 @@ public class Line {
     private final Long id;
     private final Name name;
     private final LineColor color;
-    private final Integer extraFare;
+    private final int extraFare;
 
     public Line(String name, String color) {
         this(null, name, color);
     }
 
-    public Line(String name, String color, Integer extraFare) {
+    public Line(String name, String color, int extraFare) {
         this(null, name, color, extraFare);
     }
 
     public Line(Long id, String name, String color) {
-        this(id, name, color, null);
+        this(id, name, color, 0);
     }
 
-    public Line(Long id, String name, String color, Integer extraFare) {
+    public Line(Long id, String name, String color, int extraFare) {
         this.id = id;
         this.name = Name.of(name);
         this.color = LineColor.of(color);
@@ -42,7 +42,7 @@ public class Line {
         return color.getColor();
     }
 
-    public Integer getExtraFare() {
+    public int getExtraFare() {
         return extraFare;
     }
 

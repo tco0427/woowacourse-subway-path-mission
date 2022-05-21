@@ -5,22 +5,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.test.context.jdbc.Sql;
 import wooteco.subway.dto.StationRequest;
 import wooteco.subway.dto.StationResponse;
-import wooteco.subway.service.fake.FakeSectionDao;
-import wooteco.subway.service.fake.FakeStationDao;
 
+@SpringBootTest
+@Sql("/truncate.sql")
 class StationServiceTest {
 
-    private StationService stationService;
+    private final StationService stationService;
 
-    @BeforeEach
-    void setUp() {
-        stationService = new StationService(new FakeStationDao(), new FakeSectionDao());
+    @Autowired
+    public StationServiceTest(StationService stationService) {
+        this.stationService = stationService;
     }
 
     @Test
