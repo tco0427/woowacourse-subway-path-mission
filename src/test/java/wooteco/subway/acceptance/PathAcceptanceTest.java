@@ -19,6 +19,8 @@ import wooteco.subway.dto.StationResponse;
 
 public class PathAcceptanceTest extends AcceptanceTest {
 
+    private static final int DEFAULT_FARE = 0;
+
     @DisplayName("출발역과 도착역을 기반으로 최단 경로를 조회할 수 있다.")
     @Test
     public void findPath() {
@@ -31,7 +33,6 @@ public class PathAcceptanceTest extends AcceptanceTest {
         Long lineId = extractId(AcceptanceFixture.post(params, "/lines"));
 
         final SectionRequest sectionRequest = new SectionRequest(stationId1, stationId2, 4);
-
         AcceptanceFixture.post(sectionRequest, "/lines/" + lineId + "/sections");
 
         // when
@@ -59,7 +60,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final Long targetStationId = extractStationIdFromName("역삼역");
         final int distance = 10;
 
-        registerLine(sourceStationId, targetStationId, distance);
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -80,7 +81,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
 
-        registerLine(sourceStationId, targetStationId, distance);
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -101,7 +102,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
 
-        registerLine(sourceStationId, targetStationId, distance);
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
@@ -114,8 +115,76 @@ public class PathAcceptanceTest extends AcceptanceTest {
         assertThat(pathResponse.getFare()).isEqualTo(2150);
     }
 
-    private void registerLine(Long sourceStationId, Long targetStationId, int distance) {
-        final LineRequest params = new LineRequest("2호선", "bg-red-600", sourceStationId, targetStationId, distance);
+    @DisplayName("청소년은 기본 운임에서 350원을 공제한 금액의 20%를 할인받는다.")
+    @ParameterizedTest
+    @ValueSource(ints = {13, 14, 15, 16, 17, 18})
+    public void testTeenagerFare(int age) {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("역삼역");
+        final int distance = 58;
+
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=" + age);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(1790);
+    }
+
+    @DisplayName("어린이는 기본 운임에서 350원을 공제한 금액의 50%를 할인받는다.")
+    @ParameterizedTest
+    @ValueSource(ints = {6, 7, 8, 9, 10, 11, 12})
+    public void testChildrenFare(int age) {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("역삼역");
+        final int distance = 58;
+
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=" + age);
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(1250);
+    }
+
+    @DisplayName("이용한 노선 중 추가 요금이 있는 경우 가장 추가요금이 높은 금액만 적용한다.")
+    @Test
+    public void testExtraFromLine() {
+        // given
+        final Long sourceStationId = extractStationIdFromName("교대역");
+        final Long targetStationId = extractStationIdFromName("강남역");
+        final Long anotherTargetStationId = extractStationIdFromName("양재역");
+        final int distance = 10;
+
+        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
+
+        requestLineWithExtraFare("신분당선", targetStationId, anotherTargetStationId, distance, 900);
+
+        // when
+        final ExtractableResponse<Response> response = AcceptanceFixture.get(
+                "/paths?source=" + sourceStationId + "&target=" + anotherTargetStationId + "&age=15");
+
+        // then
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
+        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
+        assertThat(pathResponse.getFare()).isEqualTo(1950);
+    }
+
+    private void requestLineWithExtraFare(String lineName, Long sourceStationId, Long targetStationId, int distance, int extraFare) {
+        final LineRequest params = new LineRequest(lineName, "bg-red-600", sourceStationId, targetStationId, distance, extraFare);
         AcceptanceFixture.post(params, "/lines");
     }
 
