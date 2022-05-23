@@ -1,6 +1,7 @@
 package wooteco.subway.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,5 +81,37 @@ class PathTest {
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 4L, 3L, 7L, 6L);
         assertThat(weight).isEqualTo(5);
+    }
+
+    @DisplayName("최단 거리의 구간(section) 정보를 얻을 수 있다.")
+    @Test
+    public void getShortestEdge() {
+        // given
+        List<Section> sections = new ArrayList<>();
+        sections.add(new Section(1L, 1L, 1L, 2L, 1));
+        sections.add(new Section(2L, 1L, 2L, 5L, 2));
+        sections.add(new Section(3L, 1L, 5L, 7L, 2));
+        sections.add(new Section(4L, 1L, 7L, 6L, 1));
+
+        sections.add(new Section(5L, 2L, 2L, 4L, 1));
+        sections.add(new Section(6L, 2L, 4L, 3L, 1));
+        sections.add(new Section(7L, 2L, 3L, 7L, 1));
+
+
+        final Path path = new Path(sections);
+
+        // when
+        final List<Section> shortestEdge = path.getShortestEdge(1L, 6L);
+
+        // then
+        assertThat(shortestEdge).hasSize(5)
+                .extracting("id", "upStationId", "downStationId")
+                .containsExactly(
+                        tuple(1L, 1L, 2L),
+                        tuple(5L, 2L, 4L),
+                        tuple(6L, 4L, 3L),
+                        tuple(7L, 3L, 7L),
+                        tuple(4L, 7L, 6L)
+                );
     }
 }

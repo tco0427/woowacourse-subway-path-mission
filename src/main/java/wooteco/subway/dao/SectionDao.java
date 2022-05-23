@@ -11,8 +11,6 @@ public interface SectionDao {
 
     List<Section> findByLineId(Long id);
 
-    List<Section> findAllByStationIds(List<Long> stationIds);
-
     List<Section> findAll();
 
     int deleteById(Long id);

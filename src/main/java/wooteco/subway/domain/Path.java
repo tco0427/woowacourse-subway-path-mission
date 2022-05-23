@@ -1,17 +1,18 @@
 package wooteco.subway.domain;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.WeightedMultigraph;
+import wooteco.subway.domain.vo.SectionEdge;
 
 public class Path {
 
-    private final WeightedMultigraph<Long, DefaultWeightedEdge> graph = new WeightedMultigraph<>(
-            DefaultWeightedEdge.class);
+    private final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
 
     public Path(List<Section> sections) {
         final List<Long> stationIds = getStationIds(sections);
@@ -38,18 +39,27 @@ public class Path {
 
     private void addEdges(List<Section> sections) {
         for (Section section : sections) {
-            graph.setEdgeWeight(graph.addEdge(section.getUpStationId(), section.getDownStationId()),
-                    section.getDistance());
+            final SectionEdge sectionEdge = new SectionEdge(section);
+            graph.addEdge(section.getUpStationId(), section.getDownStationId(), sectionEdge);
         }
     }
 
     public List<Long> getShortestPath(Long sourceId, Long targetId) {
-        DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
         return dijkstraShortestPath.getPath(sourceId, targetId).getVertexList();
     }
 
     public int getShortestPathWeight(Long sourceId, Long targetId) {
-        DijkstraShortestPath<Long, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
         return (int) dijkstraShortestPath.getPath(sourceId, targetId).getWeight();
+    }
+
+    public List<Section> getShortestEdge(Long sourceId, Long targetId) {
+        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        final List<SectionEdge> edges = dijkstraShortestPath.getPath(sourceId, targetId).getEdgeList();
+
+        return edges.stream()
+                .map(SectionEdge::getSection)
+                .collect(toList());
     }
 }

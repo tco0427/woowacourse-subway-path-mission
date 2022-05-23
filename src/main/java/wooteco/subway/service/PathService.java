@@ -39,8 +39,9 @@ public class PathService {
 
         final List<Long> shortestPath = path.getShortestPath(sourceId, targetId);
         final List<StationResponse> stations = getStationResponses(shortestPath);
+        final List<Section> shortestEdge = path.getShortestEdge(sourceId, targetId);
 
-        final int extraCost = getMaxExtraFareWithLine(shortestPath);
+        final int extraCost = getMaxExtraFareWithLine(shortestEdge);
         final int distance = path.getShortestPathWeight(sourceId, targetId);
         final Fare fare = new Fare(distance, extraCost, age);
 
@@ -58,8 +59,7 @@ public class PathService {
                 .collect(toList());
     }
 
-    private int getMaxExtraFareWithLine(List<Long> stationIds) {
-        final List<Section> sections = sectionDao.findAllByStationIds(stationIds);
+    private int getMaxExtraFareWithLine(List<Section> sections) {
         final List<Line> lines = lineDao.findAllBySections(sections);
 
         return lines.stream()
