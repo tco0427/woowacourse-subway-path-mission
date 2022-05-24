@@ -20,11 +20,11 @@ class PathTest {
         sections.add(new Section(3L, 1L, 3L, 4L, 4));
         sections.add(new Section(4L, 1L, 2L, 3L, 4));
 
-        final Path path = new Path(sections);
+        final Path path = Path.of(sections, 1L, 5L);
 
         // when
-        List<Long> shortestPath = path.getShortestPath(1L, 5L);
-        final int weight = path.getShortestPathWeight(1L, 5L);
+        List<Long> shortestPath = path.getShortestPath();
+        final int weight = path.getShortestPathWeight();
 
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 5L);
@@ -46,11 +46,11 @@ class PathTest {
         sections.add(new Section(7L, 2L, 4L, 6L, 1));
 
 
-        final Path path = new Path(sections);
+        final Path path = Path.of(sections, 1L, 7L);
 
         // when
-        List<Long> shortestPath = path.getShortestPath(1L, 7L);
-        final int weight = path.getShortestPathWeight(1L, 7L);
+        List<Long> shortestPath = path.getShortestPath();
+        final int weight = path.getShortestPathWeight();
 
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 6L, 7L);
@@ -72,11 +72,11 @@ class PathTest {
         sections.add(new Section(7L, 2L, 3L, 7L, 1));
 
 
-        final Path path = new Path(sections);
+        final Path path = Path.of(sections, 1L, 6L);
 
         // when
-        List<Long> shortestPath = path.getShortestPath(1L, 6L);
-        final int weight = path.getShortestPathWeight(1L, 6L);
+        List<Long> shortestPath = path.getShortestPath();
+        final int weight = path.getShortestPathWeight();
 
         // then
         assertThat(shortestPath).containsExactly(1L, 2L, 4L, 3L, 7L, 6L);
@@ -98,10 +98,10 @@ class PathTest {
         sections.add(new Section(7L, 2L, 3L, 7L, 1));
 
 
-        final Path path = new Path(sections);
+        final Path path = Path.of(sections, 1L, 6L);
 
         // when
-        final List<Section> shortestEdge = path.getShortestEdge(1L, 6L);
+        final List<Section> shortestEdge = path.getShortestEdge();
 
         // then
         assertThat(shortestEdge).hasSize(5)

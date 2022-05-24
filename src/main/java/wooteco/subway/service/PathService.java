@@ -35,14 +35,14 @@ public class PathService {
     @Transactional(readOnly = true)
     public PathResponse findPath(Long sourceId, Long targetId, Integer age) {
         final List<Section> sections = sectionDao.findAll();
-        final Path path = new Path(sections);
+        final Path path = Path.of(sections, sourceId, targetId);
 
-        final List<Long> shortestPath = path.getShortestPath(sourceId, targetId);
+        final List<Long> shortestPath = path.getShortestPath();
         final List<StationResponse> stations = getStationResponses(shortestPath);
-        final List<Section> shortestEdge = path.getShortestEdge(sourceId, targetId);
+        final List<Section> shortestEdge = path.getShortestEdge();
 
         final int extraCost = getMaxExtraFareWithLine(shortestEdge);
-        final int distance = path.getShortestPathWeight(sourceId, targetId);
+        final int distance = path.getShortestPathWeight();
         final Fare fare = new Fare(distance, extraCost, age);
 
         return new PathResponse(stations, distance, fare.calculate());

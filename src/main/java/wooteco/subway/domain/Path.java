@@ -6,23 +6,31 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.WeightedMultigraph;
 import wooteco.subway.domain.vo.SectionEdge;
 
 public class Path {
 
-    private final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
+    private final GraphPath<Long, SectionEdge> path;
 
-    public Path(List<Section> sections) {
-        final List<Long> stationIds = getStationIds(sections);
-
-        addVertexes(stationIds);
-        addEdges(sections);
+    private Path(GraphPath<Long, SectionEdge> path) {
+        this.path = path;
     }
 
-    private List<Long> getStationIds(List<Section> sections) {
-        Set<Long> stationIds = new HashSet<>();
+    public static Path of(List<Section> sections, Long sourceId, Long targetId) {
+        final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
+        addVertexes(graph, getStationIds(sections));
+        addEdges(graph, sections);
+
+        final DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
+        return new Path(dijkstraShortestPath.getPath(sourceId, targetId));
+    }
+
+    private static List<Long> getStationIds(List<Section> sections) {
+        final Set<Long> stationIds = new HashSet<>();
+
         for (Section section : sections) {
             stationIds.add(section.getUpStationId());
             stationIds.add(section.getDownStationId());
@@ -31,32 +39,29 @@ public class Path {
         return new ArrayList<>(stationIds);
     }
 
-    private void addVertexes(List<Long> stationIds) {
+    private static void addVertexes(WeightedMultigraph<Long, SectionEdge> graph, List<Long> stationIds) {
         for (Long stationId : stationIds) {
             graph.addVertex(stationId);
         }
     }
 
-    private void addEdges(List<Section> sections) {
+    private static void addEdges(WeightedMultigraph<Long, SectionEdge> graph, List<Section> sections) {
         for (Section section : sections) {
             final SectionEdge sectionEdge = new SectionEdge(section);
             graph.addEdge(section.getUpStationId(), section.getDownStationId(), sectionEdge);
         }
     }
 
-    public List<Long> getShortestPath(Long sourceId, Long targetId) {
-        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-        return dijkstraShortestPath.getPath(sourceId, targetId).getVertexList();
+    public List<Long> getShortestPath() {
+        return path.getVertexList();
     }
 
-    public int getShortestPathWeight(Long sourceId, Long targetId) {
-        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-        return (int) dijkstraShortestPath.getPath(sourceId, targetId).getWeight();
+    public int getShortestPathWeight() {
+        return (int) path.getWeight();
     }
 
-    public List<Section> getShortestEdge(Long sourceId, Long targetId) {
-        DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-        final List<SectionEdge> edges = dijkstraShortestPath.getPath(sourceId, targetId).getEdgeList();
+    public List<Section> getShortestEdge() {
+        final List<SectionEdge> edges = path.getEdgeList();
 
         return edges.stream()
                 .map(SectionEdge::getSection)
