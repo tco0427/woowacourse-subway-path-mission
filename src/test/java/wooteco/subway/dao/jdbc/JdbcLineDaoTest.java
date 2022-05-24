@@ -17,7 +17,7 @@ import wooteco.subway.domain.Section;
 class JdbcLineDaoTest {
 
     private static final String FAIL_FIND_LINE = "fail";
-    private static final Line INAPPROPRIATE_LINE = new Line(FAIL_FIND_LINE, FAIL_FIND_LINE);
+    private static final Line INAPPROPRIATE_LINE = new Line(FAIL_FIND_LINE, FAIL_FIND_LINE, 0);
 
     private final JdbcLineDao jdbcLineDao;
 
@@ -30,7 +30,7 @@ class JdbcLineDaoTest {
     @DisplayName("노선을 등록할 수 있다.")
     void save() {
         // given
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
 
         // when
         final Line savedLine = jdbcLineDao.save(line);
@@ -44,8 +44,8 @@ class JdbcLineDaoTest {
     @DisplayName("전체 노선을 조회할 수 있다.")
     void findAll() {
         // given
-        final Line line1 = new Line("신분당선", "bg-red-600");
-        final Line line2 = new Line("분당선", "bg-green-600");
+        final Line line1 = new Line("신분당선", "bg-red-600", 0);
+        final Line line2 = new Line("분당선", "bg-green-600", 0);
         jdbcLineDao.save(line1);
         jdbcLineDao.save(line2);
 
@@ -64,7 +64,7 @@ class JdbcLineDaoTest {
     @DisplayName("단건 노선을 조회한다.")
     void findById() {
         // given
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         // when
@@ -80,7 +80,7 @@ class JdbcLineDaoTest {
     @DisplayName("기존 노선의 이름과 색상을 변경할 수 있다.")
     void updateById() {
         // given
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         // when
@@ -99,7 +99,7 @@ class JdbcLineDaoTest {
     @DisplayName("노선을 삭제할 수 있다.")
     void deleteById() {
         // given
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         // when & then
@@ -110,9 +110,9 @@ class JdbcLineDaoTest {
     @Test
     public void findAllBySections() {
         // given
-        final Long lineId1 = jdbcLineDao.save(new Line("분당선", "bg-green-600")).getId();
-        final Long lineId2 = jdbcLineDao.save(new Line("신분당선", "bg-red-600")).getId();
-        final Long lineId3 = jdbcLineDao.save(new Line("다른분당선", "bg-red-600")).getId();
+        final Long lineId1 = jdbcLineDao.save(new Line("분당선", "bg-green-600", 0)).getId();
+        final Long lineId2 = jdbcLineDao.save(new Line("신분당선", "bg-red-600", 0)).getId();
+        final Long lineId3 = jdbcLineDao.save(new Line("다른분당선", "bg-red-600", 0)).getId();
 
         final List<Section> sampleSections = List.of(
                 new Section(1L, lineId1, 1L, 2L, 10),

@@ -35,7 +35,7 @@ class JdbcSectionDaoTest {
         final Long upStationId = jdbcStationDao.save(station1);
         final Long downStationId = jdbcStationDao.save(station2);
 
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         // when
@@ -56,7 +56,7 @@ class JdbcSectionDaoTest {
         final Long upStationId = jdbcStationDao.save(station1);
         final Long downStationId = jdbcStationDao.save(station2);
 
-        final Line line = new Line("신분당선", "bg-red-600");
+        final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         final Section section = new Section(savedLine.getId(), upStationId, downStationId, 10);

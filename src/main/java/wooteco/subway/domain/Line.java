@@ -11,10 +11,6 @@ public class Line {
     private final LineColor color;
     private final int extraFare;
 
-    public Line(String name, String color) {
-        this(null, name, color);
-    }
-
     public Line(String name, String color, int extraFare) {
         this(null, name, color, extraFare);
     }
