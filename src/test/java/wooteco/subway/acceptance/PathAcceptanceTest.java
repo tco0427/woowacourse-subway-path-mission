@@ -37,7 +37,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + stationId1 + "&target=" + stationId3 + "&age=1");
+                "/paths?source=" + stationId1 + "&target=" + stationId3 + "&age=21");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -64,7 +64,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=1");
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=21");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -85,7 +85,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=1");
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=21");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -106,7 +106,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=1");
+                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=21");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());

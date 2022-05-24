@@ -11,7 +11,6 @@ public class Fare {
     private static final int SECOND_CHARGING_UNIT = 8;
     private static final int ZERO_EXTRA_COST = 0;
     private static final int NO_DISCOUNT_AGE = 20;
-    private static final int DEDUCT = 350;
 
     private final Integer distance;
     private final int extraCost;
@@ -29,20 +28,10 @@ public class Fare {
 
     public int calculate() {
         final int calculateWithoutDiscount = calculateWithoutDiscount();
+        final AgeSection ageSection = AgeSection.from(age);
+        final int discount = ageSection.getDiscount(calculateWithoutDiscount);
 
-        int deductedAmount = calculateWithoutDiscount - DEDUCT;
-
-        if (age >= 6 && age < 13) {
-            final double discount = deductedAmount * 0.5;
-            return calculateWithoutDiscount - (int) discount;
-        }
-
-        if (age >= 13 && age < 19) {
-            final double discount = deductedAmount * 0.2;
-            return calculateWithoutDiscount - (int) discount;
-        }
-
-        return calculateWithoutDiscount;
+        return calculateWithoutDiscount - discount;
     }
 
     private int calculateWithoutDiscount() {
