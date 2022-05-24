@@ -15,6 +15,7 @@ public class SectionEdge extends DefaultWeightedEdge {
         return section;
     }
 
+    @Override
     protected double getWeight() {
         return section.getDistance();
     }
