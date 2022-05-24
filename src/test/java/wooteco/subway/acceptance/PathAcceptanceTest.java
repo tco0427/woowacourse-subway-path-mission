@@ -8,7 +8,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpStatus;
 import wooteco.subway.dto.LineRequest;
 import wooteco.subway.dto.LineResponse;
@@ -73,56 +73,13 @@ public class PathAcceptanceTest extends AcceptanceTest {
         assertThat(pathResponse.getFare()).isEqualTo(1250);
     }
 
-    @DisplayName("10km ~ 50km 사이는 5km 마다 100원이 추가된다.")
+    @DisplayName("10km ~ 50km 사이는 5km 마다 100원이 추가되고, 50km 초과인 경우 8km 마다 100원이 추가된다.")
     @ParameterizedTest
-    @ValueSource(ints = {11, 12, 13, 14, 15})
-    public void testAdditionalFare(int distance) {
+    @CsvSource(value = {"11, 20, 1350", "15, 20, 1350", "51, 20, 2150", "58, 20, 2150", "59, 21, 2250"})
+    public void testAdditionalFare(int distance, int age, int expectedFare) {
         // given
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
-
-        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
-
-        // when
-        final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=21");
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
-        assertThat(pathResponse.getFare()).isEqualTo(1350);
-    }
-
-    @DisplayName("운행 거리가 50km 초과인 경우 8km 마다 100원이 추가된다.")
-    @ParameterizedTest
-    @ValueSource(ints = {51, 52, 53, 54, 55, 56, 57, 58})
-    public void testFareWhenOver50km(int distance) {
-        // given
-        final Long sourceStationId = extractStationIdFromName("교대역");
-        final Long targetStationId = extractStationIdFromName("역삼역");
-
-        requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
-
-        // when
-        final ExtractableResponse<Response> response = AcceptanceFixture.get(
-                "/paths?source=" + sourceStationId + "&target=" + targetStationId + "&age=21");
-
-        // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-
-        final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
-        assertThat(pathResponse.getFare()).isEqualTo(2150);
-    }
-
-    @DisplayName("청소년은 기본 운임에서 350원을 공제한 금액의 20%를 할인받는다.")
-    @ParameterizedTest
-    @ValueSource(ints = {13, 14, 15, 16, 17, 18})
-    public void testTeenagerFare(int age) {
-        // given
-        final Long sourceStationId = extractStationIdFromName("교대역");
-        final Long targetStationId = extractStationIdFromName("역삼역");
-        final int distance = 58;
 
         requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
 
@@ -134,17 +91,16 @@ public class PathAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
-        assertThat(pathResponse.getFare()).isEqualTo(1790);
+        assertThat(pathResponse.getFare()).isEqualTo(expectedFare);
     }
 
-    @DisplayName("어린이는 기본 운임에서 350원을 공제한 금액의 50%를 할인받는다.")
+    @DisplayName("어린이는 기본 운임에서 350원을 공제한 금액의 50%를 할인받고, 청소년은 20%를 할인받는다.")
     @ParameterizedTest
-    @ValueSource(ints = {6, 7, 8, 9, 10, 11, 12})
-    public void testChildrenFare(int age) {
+    @CsvSource(value = {"58, 6, 1250", "58, 12, 1250", "58, 13, 1790", "58, 18, 1790", "58, 20, 2150"})
+    public void testTeenagerFare(int distance, int age, int expectedFare) {
         // given
         final Long sourceStationId = extractStationIdFromName("교대역");
         final Long targetStationId = extractStationIdFromName("역삼역");
-        final int distance = 58;
 
         requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
 
@@ -156,7 +112,7 @@ public class PathAcceptanceTest extends AcceptanceTest {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         final PathResponse pathResponse = response.jsonPath().getObject(".", PathResponse.class);
-        assertThat(pathResponse.getFare()).isEqualTo(1250);
+        assertThat(pathResponse.getFare()).isEqualTo(expectedFare);
     }
 
     @DisplayName("이용한 노선 중 추가 요금이 있는 경우 가장 추가요금이 높은 금액만 적용한다.")
