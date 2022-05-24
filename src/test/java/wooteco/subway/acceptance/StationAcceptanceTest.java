@@ -22,7 +22,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         final StationRequest params = new StationRequest("강남역");
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/stations");
+        final ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -38,7 +38,7 @@ public class StationAcceptanceTest extends AcceptanceTest {
         AcceptanceFixture.post(params, "/stations");
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/stations");
+        final ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -49,19 +49,19 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void getStations() {
         /// given
         final StationRequest params1 = new StationRequest("강남역");
-        ExtractableResponse<Response> createResponse1 = AcceptanceFixture.post(params1, "/stations");
+        final ExtractableResponse<Response> createResponse1 = AcceptanceFixture.post(params1, "/stations");
 
         final StationRequest params2 = new StationRequest("역삼역");
-        ExtractableResponse<Response> createResponse2 = AcceptanceFixture.post(params2, "/stations");
+        final ExtractableResponse<Response> createResponse2 = AcceptanceFixture.post(params2, "/stations");
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.get("/stations");
+        final ExtractableResponse<Response> response = AcceptanceFixture.get("/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<Long> expectedLineIds = List.of(extractId(createResponse1), extractId(createResponse2));
-        List<Long> resultLineIds = extractIds(response);
+        final List<Long> expectedLineIds = List.of(extractId(createResponse1), extractId(createResponse2));
+        final List<Long> resultLineIds = extractIds(response);
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
@@ -70,14 +70,17 @@ public class StationAcceptanceTest extends AcceptanceTest {
     void deleteStation() {
         // given
         final StationRequest params = new StationRequest("강남역");
-        ExtractableResponse<Response> createResponse = AcceptanceFixture.post(params, "/stations");
+        final ExtractableResponse<Response> createResponse = AcceptanceFixture.post(params, "/stations");
 
         // when
-        String uri = createResponse.header("Location");
-        ExtractableResponse<Response> response = AcceptanceFixture.delete(uri);
+        final String uri = createResponse.header("Location");
+        final ExtractableResponse<Response> response = AcceptanceFixture.delete(uri);
+        final ExtractableResponse<Response> getResponse = AcceptanceFixture.get("/stations");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(extractIds(getResponse)).isEmpty();
     }
 
     private Long extractId(ExtractableResponse<Response> response) {

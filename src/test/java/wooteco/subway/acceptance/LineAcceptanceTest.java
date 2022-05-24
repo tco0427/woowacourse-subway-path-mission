@@ -29,7 +29,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final LineRequest params = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/lines");
+        final ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -49,7 +49,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         AcceptanceFixture.post(params, "/lines");
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/lines");
+        final ExtractableResponse<Response> response = AcceptanceFixture.post(params, "/lines");
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -64,10 +64,10 @@ class LineAcceptanceTest extends AcceptanceTest {
         final Long anotherStationId = createStationByName("또다른 지하철역");
 
         final LineRequest params1 = new LineRequest("신분당선", "bg-red-600", upStationId, downStationId, 10);
-        ExtractableResponse<Response> createResponse1 = AcceptanceFixture.post(params1, "/lines");
+        final ExtractableResponse<Response> createResponse1 = AcceptanceFixture.post(params1, "/lines");
 
         final LineRequest params2 = new LineRequest("분당선", "br-green-600", upStationId, anotherStationId, 10);
-        ExtractableResponse<Response> createResponse2 = AcceptanceFixture.post(params2, "/lines");
+        final ExtractableResponse<Response> createResponse2 = AcceptanceFixture.post(params2, "/lines");
 
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.get("/lines");
@@ -75,8 +75,8 @@ class LineAcceptanceTest extends AcceptanceTest {
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
-        List<Long> expectedLineIds = List.of(extractId(createResponse1), extractId(createResponse2));
-        List<Long> resultLineIds = extractIds(response);
+        final List<Long> expectedLineIds = List.of(extractId(createResponse1), extractId(createResponse2));
+        final List<Long> resultLineIds = extractIds(response);
         assertThat(resultLineIds).containsAll(expectedLineIds);
     }
 
@@ -87,7 +87,7 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String savedId = getSavedIdFromInitLine();
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.get("/lines/" + savedId);
+        final ExtractableResponse<Response> response = AcceptanceFixture.get("/lines/" + savedId);
 
         // then
         final Long findId = response.response().jsonPath().getLong("id");
@@ -105,11 +105,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String savedId = getSavedIdFromInitLine();
 
         // when
-        Map<String, String> updateParams = new HashMap<>();
+        final Map<String, String> updateParams = new HashMap<>();
         updateParams.put("name", "다른분당선");
         updateParams.put("color", "bg-red-600");
 
-        ExtractableResponse<Response> response = AcceptanceFixture.put(updateParams, "/lines/" + savedId);
+        final ExtractableResponse<Response> response = AcceptanceFixture.put(updateParams, "/lines/" + savedId);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
@@ -122,10 +122,14 @@ class LineAcceptanceTest extends AcceptanceTest {
         final String savedId = getSavedIdFromInitLine();
 
         // when
-        ExtractableResponse<Response> response = AcceptanceFixture.delete("/lines/" + savedId);
+        final ExtractableResponse<Response> response = AcceptanceFixture.delete("/lines/" + savedId);
+        final ExtractableResponse<Response> getResponse = AcceptanceFixture.get("/lines");
+
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(extractIds(getResponse)).isEmpty();
     }
 
     private String getSavedIdFromInitLine() {
