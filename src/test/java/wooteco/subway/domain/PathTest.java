@@ -20,6 +20,16 @@ class PathTest {
             new Section(7L, 2L, 4L, 6L, 1)
     );
 
+    private final static List<Section> ANOTHER_SAMPLE_SECTIONS = List.of(
+            new Section(1L, 1L, 1L, 2L, 1),
+            new Section(2L, 1L, 2L, 5L, 2),
+            new Section(3L, 1L, 5L, 7L, 2),
+            new Section(4L, 1L, 7L, 6L, 1),
+            new Section(5L, 2L, 2L, 4L, 1),
+            new Section(6L, 2L, 4L, 3L, 1),
+            new Section(7L, 2L, 3L, 7L, 1)
+    );
+
     @DisplayName("한 노선에서 구간과 역 정보를 통해 최단 경로를 구할 수 있다.")
     @Test
     public void getShortestPath() {
@@ -60,7 +70,7 @@ class PathTest {
     @Test
     public void getShortestPath3() {
         // given
-        final Path path = Path.of(SAMPLE_SECTIONS, 1L, 6L);
+        final Path path = Path.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L);
 
         // when
         List<Long> shortestPath = path.getShortestPath();
@@ -75,7 +85,7 @@ class PathTest {
     @Test
     public void getShortestEdge() {
         // given
-        final Path path = Path.of(SAMPLE_SECTIONS, 1L, 6L);
+        final Path path = Path.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L);
 
         // when
         final List<Section> shortestEdge = path.getShortestEdge();
