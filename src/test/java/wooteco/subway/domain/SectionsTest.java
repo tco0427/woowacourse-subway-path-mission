@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +16,7 @@ class SectionsTest {
     @Test
     public void addNewSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 2L, 3L, 1));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 2L, 3L, 1);
 
         // when & then
         final Section section = new Section(1L, 1L, 2L, 1);
@@ -30,9 +27,7 @@ class SectionsTest {
     @Test
     public void forkRodeSameUpStation() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
 
         // when
         final Section section = new Section(1L, 1L, 2L, 4);
@@ -49,9 +44,7 @@ class SectionsTest {
     @Test
     public void forkRodeSameDownStation() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
 
         // when
         final Section section = new Section(1L, 2L, 3L, 4);
@@ -68,9 +61,7 @@ class SectionsTest {
     @Test
     public void checkDistance() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 1L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 1L, 1L, 3L, 7);
 
         // when & then
         final Section section = new Section(2L, 1L, 1L, 2L, 7);
@@ -82,9 +73,7 @@ class SectionsTest {
     @Test
     public void sameSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 1L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 1L, 1L, 3L, 7);
 
         // when & then
         final Section section = new Section(2L,1L, 1L, 3L, 7);
@@ -96,10 +85,10 @@ class SectionsTest {
     @Test
     public void IllegalAddSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 2L, 3L, 4));
-        sectionList.add(new Section(1L, 1L, 2L, 3));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 2L, 3L, 4),
+                new Section(1L, 1L, 2L, 3)
+        ));
 
         // when & then
         final Section section = new Section(1L, 4L, 5L, 7);
@@ -112,10 +101,10 @@ class SectionsTest {
     @Test
     public void deleteSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 2L, 3));
-        sectionList.add(new Section(1L, 2L, 3L, 4));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 2L, 3),
+                new Section(1L, 2L, 3L, 4)
+        ));
 
         // when
         final Station station = new Station(2L, "중간역");
@@ -133,9 +122,7 @@ class SectionsTest {
     @Test
     public void IllegalDeleteSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
 
         // when & then
         final Station station = new Station(1L, "상행역");
@@ -147,10 +134,10 @@ class SectionsTest {
     @Test
     public void deleteFirstSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 2L, 7));
-        sectionList.add(new Section(1L, 2L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 2L, 7),
+                new Section(1L, 2L, 3L, 7)
+        ));
 
         final Station deleteStation = new Station(1L, "첫번째역");
 
@@ -169,10 +156,10 @@ class SectionsTest {
     @Test
     public void deleteLastSection() {
         // given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 1L, 2L, 7));
-        sectionList.add(new Section(1L, 2L, 3L, 7));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 1L, 2L, 7),
+                new Section(1L, 2L, 3L, 7)
+        ));
 
         final Station deleteStation = new Station(3L, "마지막역");
 
@@ -191,12 +178,12 @@ class SectionsTest {
     @Test
     public void sortedSection() {
         //given
-        List<Section> sectionList = new ArrayList<>();
-        sectionList.add(new Section(1L, 4L, 5L, 3));
-        sectionList.add(new Section(1L, 1L, 2L, 3));
-        sectionList.add(new Section(1L, 3L, 4L, 4));
-        sectionList.add(new Section(1L, 2L, 3L, 4));
-        final Sections sections = new Sections(sectionList);
+        final Sections sections = new Sections(List.of(
+                new Section(1L, 4L, 5L, 3),
+                new Section(1L, 1L, 2L, 3),
+                new Section(1L, 3L, 4L, 4),
+                new Section(1L, 2L, 3L, 4)
+        ));
 
         //when
         final List<Section> sortedSections = sections.getSections();
@@ -210,5 +197,17 @@ class SectionsTest {
                         tuple(3L, 4L),
                         tuple(4L, 5L)
                 );
+    }
+
+    private Sections makeSectionsBySingleSection(Long id, Long lineId, Long upStationId, Long downStationId, int distance) {
+        return new Sections(List.of(
+                new Section(id, lineId, upStationId, downStationId, distance)
+        ));
+    }
+
+    private Sections makeSectionsBySingleSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+        return new Sections(List.of(
+                new Section(lineId, upStationId, downStationId, distance)
+        ));
     }
 }
