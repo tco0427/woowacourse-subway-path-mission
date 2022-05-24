@@ -9,7 +9,6 @@ import java.util.Set;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.WeightedMultigraph;
-import wooteco.subway.domain.vo.SectionEdge;
 
 public class Path {
 

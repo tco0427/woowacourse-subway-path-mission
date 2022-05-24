@@ -169,7 +169,6 @@ public class PathAcceptanceTest extends AcceptanceTest {
         final int distance = 10;
 
         requestLineWithExtraFare("2호선", sourceStationId, targetStationId, distance, DEFAULT_FARE);
-
         requestLineWithExtraFare("신분당선", targetStationId, anotherTargetStationId, distance, 900);
 
         // when
