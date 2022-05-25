@@ -3,7 +3,7 @@ package wooteco.subway.domain.path;
 import java.util.List;
 import wooteco.subway.domain.Section;
 
-public interface PathStrategy {
+public interface PathGenerator {
 
     List<Long> getShortestPath();
 

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import wooteco.subway.domain.path.JgraphtPath;
+import wooteco.subway.domain.path.JgraphtPathGenerator;
 import wooteco.subway.domain.path.Path;
 
 class PathTest {
@@ -42,7 +42,7 @@ class PathTest {
         sections.add(new Section(3L, 1L, 3L, 4L, 4));
         sections.add(new Section(4L, 1L, 2L, 3L, 4));
 
-        final Path path = new Path(JgraphtPath.of(sections, 1L, 5L));
+        final Path path = new Path(JgraphtPathGenerator.of(sections, 1L, 5L));
 
         // when
         List<Long> shortestPath = path.getShortestPath();
@@ -57,7 +57,7 @@ class PathTest {
     @Test
     public void getShortestPath2() {
         // given
-        final Path path = new Path(JgraphtPath.of(SAMPLE_SECTIONS, 1L, 7L));
+        final Path path = new Path(JgraphtPathGenerator.of(SAMPLE_SECTIONS, 1L, 7L));
 
         // when
         List<Long> shortestPath = path.getShortestPath();
@@ -72,7 +72,7 @@ class PathTest {
     @Test
     public void getShortestPath3() {
         // given
-        final Path path = new Path(JgraphtPath.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L));
+        final Path path = new Path(JgraphtPathGenerator.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L));
 
         // when
         List<Long> shortestPath = path.getShortestPath();
@@ -87,7 +87,7 @@ class PathTest {
     @Test
     public void getShortestEdge() {
         // given
-        final Path path = new Path(JgraphtPath.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L));
+        final Path path = new Path(JgraphtPathGenerator.of(ANOTHER_SAMPLE_SECTIONS, 1L, 6L));
 
         // when
         final List<Section> shortestEdge = path.getShortestEdge();

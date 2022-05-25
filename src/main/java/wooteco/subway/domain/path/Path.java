@@ -9,10 +9,10 @@ public class Path {
     private final int shortestPathWeight;
     private final List<Section> shortestEdge;
 
-    public Path(PathStrategy pathStrategy) {
-        this.shortestPath = pathStrategy.getShortestPath();
-        this.shortestPathWeight = pathStrategy.getShortestPathWeight();
-        this.shortestEdge = pathStrategy.getShortestEdge();
+    public Path(PathGenerator pathGenerator) {
+        this.shortestPath = pathGenerator.getShortestPath();
+        this.shortestPathWeight = pathGenerator.getShortestPathWeight();
+        this.shortestEdge = pathGenerator.getShortestEdge();
     }
 
     public List<Long> getShortestPath() {

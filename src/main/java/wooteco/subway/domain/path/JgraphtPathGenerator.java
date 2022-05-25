@@ -12,21 +12,21 @@ import org.jgrapht.graph.WeightedMultigraph;
 import wooteco.subway.domain.Section;
 import wooteco.subway.domain.SectionEdge;
 
-public class JgraphtPath implements PathStrategy {
+public class JgraphtPathGenerator implements PathGenerator {
 
     private final GraphPath<Long, SectionEdge> path;
 
-    private JgraphtPath(GraphPath<Long, SectionEdge> path) {
+    private JgraphtPathGenerator(GraphPath<Long, SectionEdge> path) {
         this.path = path;
     }
 
-    public static JgraphtPath of(List<Section> sections, Long sourceId, Long targetId) {
+    public static JgraphtPathGenerator of(List<Section> sections, Long sourceId, Long targetId) {
         final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
         addVertexes(graph, getStationIds(sections));
         addEdges(graph, sections);
 
         final DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-        return new JgraphtPath(dijkstraShortestPath.getPath(sourceId, targetId));
+        return new JgraphtPathGenerator(dijkstraShortestPath.getPath(sourceId, targetId));
     }
 
     private static List<Long> getStationIds(List<Section> sections) {
