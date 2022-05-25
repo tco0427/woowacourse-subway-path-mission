@@ -88,7 +88,7 @@ public class Sections {
         final Section previousSection = getPreviousSection(stationId);
         final Section laterSection = getLaterSection(stationId);
 
-        removeFirstOrLastSection(previousSection);
+        removeFirstOrLastSection(previousSection, laterSection);
         removeMiddleSection(previousSection, laterSection);
 
         sections = sortSections(sections);
@@ -115,12 +115,14 @@ public class Sections {
                 .orElse(null);
     }
 
-    private void removeFirstOrLastSection(Section previousSection) {
+    private void removeFirstOrLastSection(Section previousSection, Section laterSection) {
         if (previousSection == null) {
             sections.remove(0);
             return;
         }
-        sections.remove(sections.size()-1);
+        if (laterSection == null) {
+            sections.remove(sections.size()-1);
+        }
     }
 
     private void removeMiddleSection(Section previousSection, Section laterSection) {
