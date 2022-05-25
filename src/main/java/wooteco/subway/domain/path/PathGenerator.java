@@ -5,9 +5,5 @@ import wooteco.subway.domain.Section;
 
 public interface PathGenerator {
 
-    List<Long> getShortestPath();
-
-    int getShortestPathWeight();
-
-    List<Section> getShortestEdge();
+    Path generatePath(List<Section> sections, Long sourceId, Long targetId);
 }

@@ -11,10 +11,10 @@ import wooteco.subway.dao.SectionDao;
 import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Fare;
 import wooteco.subway.domain.Line;
-import wooteco.subway.domain.path.JgraphtPathGenerator;
-import wooteco.subway.domain.path.Path;
 import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
+import wooteco.subway.domain.path.Path;
+import wooteco.subway.domain.path.PathGenerator;
 import wooteco.subway.dto.PathResponse;
 import wooteco.subway.dto.StationResponse;
 import wooteco.subway.exception.NotExistException;
@@ -26,17 +26,19 @@ public class PathService {
     private final StationDao stationDao;
     private final SectionDao sectionDao;
     private final LineDao lineDao;
+    private final PathGenerator pathGenerator;
 
-    public PathService(StationDao stationDao, SectionDao sectionDao, LineDao lineDao) {
+    public PathService(StationDao stationDao, SectionDao sectionDao, LineDao lineDao, PathGenerator pathGenerator) {
         this.stationDao = stationDao;
         this.sectionDao = sectionDao;
         this.lineDao = lineDao;
+        this.pathGenerator = pathGenerator;
     }
 
     @Transactional(readOnly = true)
     public PathResponse findPath(Long sourceId, Long targetId, Integer age) {
         final List<Section> sections = sectionDao.findAll();
-        final Path path = new Path(JgraphtPathGenerator.of(sections, sourceId, targetId));
+        final Path path = pathGenerator.generatePath(sections, sourceId, targetId);
 
         final List<Long> shortestPath = path.getShortestPath();
         final List<StationResponse> stations = getStationResponses(shortestPath);

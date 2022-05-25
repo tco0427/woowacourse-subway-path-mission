@@ -9,24 +9,28 @@ import java.util.Set;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.WeightedMultigraph;
+import org.springframework.stereotype.Component;
 import wooteco.subway.domain.Section;
 import wooteco.subway.domain.SectionEdge;
 
+@Component
 public class JgraphtPathGenerator implements PathGenerator {
 
-    private final GraphPath<Long, SectionEdge> path;
+    private final WeightedMultigraph<Long, SectionEdge> graph;
 
-    private JgraphtPathGenerator(GraphPath<Long, SectionEdge> path) {
-        this.path = path;
+    public JgraphtPathGenerator() {
+        this.graph = new WeightedMultigraph<>(SectionEdge.class);
     }
 
-    public static JgraphtPathGenerator of(List<Section> sections, Long sourceId, Long targetId) {
-        final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
+    @Override
+    public Path generatePath(List<Section> sections, Long sourceId, Long targetId) {
         addVertexes(graph, getStationIds(sections));
         addEdges(graph, sections);
 
         final DijkstraShortestPath<Long, SectionEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
-        return new JgraphtPathGenerator(dijkstraShortestPath.getPath(sourceId, targetId));
+        final GraphPath<Long, SectionEdge> path = dijkstraShortestPath.getPath(sourceId, targetId);
+
+        return new Path(getShortestPath(path), getShortestPathWeight(path), getShortestEdge(path));
     }
 
     private static List<Long> getStationIds(List<Section> sections) {
@@ -53,18 +57,15 @@ public class JgraphtPathGenerator implements PathGenerator {
         }
     }
 
-    @Override
-    public List<Long> getShortestPath() {
+    private List<Long> getShortestPath(GraphPath<Long, SectionEdge> path) {
         return path.getVertexList();
     }
 
-    @Override
-    public int getShortestPathWeight() {
+    private int getShortestPathWeight(GraphPath<Long, SectionEdge> path) {
         return (int) path.getWeight();
     }
 
-    @Override
-    public List<Section> getShortestEdge() {
+    private List<Section> getShortestEdge(GraphPath<Long, SectionEdge> path) {
         final List<SectionEdge> edges = path.getEdgeList();
 
         return edges.stream()
