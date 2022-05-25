@@ -16,7 +16,7 @@ import wooteco.subway.dto.StationResponse;
 
 @SpringBootTest
 @Sql("/truncate.sql")
-class PathServiceTest {
+class PathStrategyTest {
 
     private final PathService pathService;
     private final StationService stationService;
@@ -24,7 +24,7 @@ class PathServiceTest {
     private final LineService lineService;
 
     @Autowired
-    public PathServiceTest(PathService pathService, StationService stationService, SectionService sectionService, LineService lineService) {
+    public PathStrategyTest(PathService pathService, StationService stationService, SectionService sectionService, LineService lineService) {
         this.pathService = pathService;
         this.stationService = stationService;
         this.sectionService = sectionService;

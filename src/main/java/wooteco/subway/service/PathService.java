@@ -11,7 +11,8 @@ import wooteco.subway.dao.SectionDao;
 import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Fare;
 import wooteco.subway.domain.Line;
-import wooteco.subway.domain.Path;
+import wooteco.subway.domain.path.JgraphtPath;
+import wooteco.subway.domain.path.Path;
 import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
 import wooteco.subway.dto.PathResponse;
@@ -35,7 +36,7 @@ public class PathService {
     @Transactional(readOnly = true)
     public PathResponse findPath(Long sourceId, Long targetId, Integer age) {
         final List<Section> sections = sectionDao.findAll();
-        final Path path = Path.of(sections, sourceId, targetId);
+        final Path path = new Path(JgraphtPath.of(sections, sourceId, targetId));
 
         final List<Long> shortestPath = path.getShortestPath();
         final List<StationResponse> stations = getStationResponses(shortestPath);
