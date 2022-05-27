@@ -1,15 +1,14 @@
 package wooteco.subway.dao.jdbc;
 
-import java.sql.PreparedStatement;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import wooteco.subway.dao.StationDao;
 import wooteco.subway.domain.Station;
@@ -21,32 +20,35 @@ public class JdbcStationDao implements StationDao {
             resultSet.getLong("id"),
             resultSet.getString("name")
     );
+    private static final String STATION_TABLE_NAME = "station";
+    private static final String GENERATE_KEY_COLUMN = "id";
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
 
     public JdbcStationDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName(STATION_TABLE_NAME)
+                .usingGeneratedKeyColumns(GENERATE_KEY_COLUMN);
     }
 
     @Override
     public Long save(Station station) {
         String sql = "INSERT INTO station (name) values (?)";
 
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            final PreparedStatement statement = connection.prepareStatement(sql, new String[]{"id"});
-            statement.setString(1, station.getName());
-            return statement;
-        }, keyHolder);
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("name", station.getName());
 
-        return Objects.requireNonNull(keyHolder.getKey()).longValue();
+        return simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
     }
 
     @Override
     public Optional<Station> findById(Long id) {
-        String sql = "SELECT * FROM station WHERE id = ?";
+        String sql = "SELECT * FROM station WHERE id = :id";
+
         try {
-            final Station station = jdbcTemplate.queryForObject(sql, STATION_ROW_MAPPER, id);
+            final Station station = jdbcTemplate.queryForObject(sql, Map.of("id", id), STATION_ROW_MAPPER);
             return Optional.ofNullable(station);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -62,17 +64,15 @@ public class JdbcStationDao implements StationDao {
 
     @Override
     public List<Station> findAllByIds(List<Long> stationIds) {
-        final String inSql = String.join(",", Collections.nCopies(stationIds.size(), "?"));
+        String sql = "SELECT * FROM station WHERE id IN (:stationIds)";
 
-        String sql = String.format("SELECT * FROM station WHERE id IN (%s)", inSql);
-
-        return jdbcTemplate.query(sql, stationIds.toArray(), STATION_ROW_MAPPER);
+        return jdbcTemplate.query(sql, Map.of("stationIds", stationIds), STATION_ROW_MAPPER);
     }
 
     @Override
     public int deleteById(Long id) {
-        String sql = "DELETE FROM station WHERE id = ?";
+        String sql = "DELETE FROM station WHERE id = :id";
 
-        return jdbcTemplate.update(sql, id);
+        return jdbcTemplate.update(sql, Map.of("id", id));
     }
 }
