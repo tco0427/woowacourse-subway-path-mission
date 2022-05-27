@@ -45,7 +45,7 @@ public class JdbcStationDao implements StationDao {
 
     @Override
     public Optional<Station> findById(Long id) {
-        String sql = "SELECT * FROM station WHERE id = :id";
+        String sql = "SELECT id, name FROM station WHERE id = :id";
 
         try {
             final Station station = jdbcTemplate.queryForObject(sql, Map.of("id", id), STATION_ROW_MAPPER);
@@ -57,14 +57,14 @@ public class JdbcStationDao implements StationDao {
 
     @Override
     public List<Station> findAll() {
-        String sql = "SELECT * FROM station";
+        String sql = "SELECT id, name FROM station";
 
         return jdbcTemplate.query(sql, STATION_ROW_MAPPER);
     }
 
     @Override
     public List<Station> findAllByIds(List<Long> stationIds) {
-        String sql = "SELECT * FROM station WHERE id IN (:stationIds)";
+        String sql = "SELECT id, name FROM station WHERE id IN (:stationIds)";
 
         return jdbcTemplate.query(sql, Map.of("stationIds", stationIds), STATION_ROW_MAPPER);
     }

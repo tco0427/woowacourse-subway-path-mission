@@ -49,7 +49,9 @@ public class JdbcLineDao implements LineDao {
 
     @Override
     public Optional<Line> findById(Long id) {
-        String sql = "SELECT * FROM line WHERE id = :id";
+        String sql = "SELECT id, name, color, extraFare "
+                + "FROM line "
+                + "WHERE id = :id";
 
         try {
             final Line line = jdbcTemplate.queryForObject(sql, Map.of("id", id), LINE_ROW_MAPPER);
@@ -61,14 +63,16 @@ public class JdbcLineDao implements LineDao {
 
     @Override
     public List<Line> findAllByIds(List<Long> ids) {
-        final String sql = "SELECT * FROM line WHERE id IN (:ids)";
+        final String sql = "SELECT id, name, color, extraFare "
+                + "FROM line "
+                + "WHERE id IN (:ids)";
 
         return jdbcTemplate.query(sql, Map.of("ids", ids), LINE_ROW_MAPPER);
     }
 
     @Override
     public List<Line> findAll() {
-        String sql = "SELECT * FROM line";
+        String sql = "SELECT id, name, color, extraFare FROM line";
 
         return jdbcTemplate.query(sql, LINE_ROW_MAPPER);
     }
