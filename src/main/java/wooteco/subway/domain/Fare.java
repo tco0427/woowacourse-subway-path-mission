@@ -12,7 +12,7 @@ public class Fare {
     private static final int ZERO_EXTRA_COST = 0;
     private static final int NO_DISCOUNT_AGE = 20;
 
-    private final Integer distance;
+    private final int distance;
     private final int extraCost;
     private final int age;
 
@@ -20,7 +20,7 @@ public class Fare {
         this(distance, ZERO_EXTRA_COST, NO_DISCOUNT_AGE);
     }
 
-    public Fare(Integer distance, int extraCost, int age) {
+    public Fare(int distance, int extraCost, int age) {
         this.distance = distance;
         this.extraCost = extraCost;
         this.age = age;
