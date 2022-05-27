@@ -67,8 +67,11 @@ public class Sections {
 
     private Section createNewSection(Section existingSection, Section newSection) {
         if (existingSection.getUpStationId().equals(newSection.getUpStationId())) {
-            return new Section(existingSection.getId(), existingSection.getLineId(), newSection.getDownStationId(),
-                    existingSection.getDownStationId(), existingSection.getDistance() - newSection.getDistance());
+            return new Section(existingSection.getId(),
+                    existingSection.getLineId(),
+                    newSection.getDownStationId(),
+                    existingSection.getDownStationId(),
+                    existingSection.getDistance() - newSection.getDistance());
         }
 
         return new Section(existingSection.getId(), existingSection.getLineId(), existingSection.getUpStationId(),
@@ -85,11 +88,11 @@ public class Sections {
     public List<Section> delete(Long stationId) {
         validateDeletableSize();
 
-        final Section previousSection = getPreviousSection(stationId);
-        final Section laterSection = getLaterSection(stationId);
+        final boolean existPreviousSection = hasPreviousSection(stationId);
+        final boolean existLaterSection = hasLaterSection(stationId);
 
-        removeFirstOrLastSection(previousSection, laterSection);
-        removeMiddleSection(previousSection, laterSection);
+        removeFirstOrLastSection(existPreviousSection, existLaterSection);
+        removeMiddleSection(existPreviousSection, existLaterSection, stationId);
 
         sections = sortSections(sections);
         return List.copyOf(sections);
@@ -101,37 +104,36 @@ public class Sections {
         }
     }
 
-    private Section getPreviousSection(Long stationId) {
+    private boolean hasPreviousSection(Long stationId) {
         return sections.stream()
-                .filter(section -> section.isSameDownStation(stationId))
-                .findAny()
-                .orElse(null);
+                .anyMatch(section -> section.isSameDownStation(stationId));
     }
 
-    private Section getLaterSection(Long stationId) {
+    private boolean hasLaterSection(Long stationId) {
         return sections.stream()
-                .filter(section -> section.isSameUpStation(stationId))
-                .findAny()
-                .orElse(null);
+                .anyMatch(section -> section.isSameUpStation(stationId));
     }
 
-    private void removeFirstOrLastSection(Section previousSection, Section laterSection) {
-        if (previousSection == null) {
+    private void removeFirstOrLastSection(boolean existPreviousSection, boolean existLaterSection) {
+        if (existPreviousSection && !existLaterSection) {
             sections.remove(0);
             return;
         }
-        if (laterSection == null) {
+        if (!existPreviousSection && existLaterSection) {
             sections.remove(sections.size() - 1);
         }
     }
 
-    private void removeMiddleSection(Section previousSection, Section laterSection) {
-        if (previousSection != null && laterSection != null) {
-            deleteSection(previousSection, laterSection);
+    private void removeMiddleSection(boolean isExistPreviousSection, boolean isExistLaterSection, Long stationId) {
+        if (isExistPreviousSection && isExistLaterSection) {
+            deleteSection(stationId);
         }
     }
 
-    private void deleteSection(Section previousSection, Section laterSection) {
+    private void deleteSection(Long stationId) {
+        final Section previousSection = findPreviousSection(stationId);
+        final Section laterSection = findLaterSection(stationId);
+
         final int distance = previousSection.getDistance() + laterSection.getDistance();
         final Section newSection = new Section(previousSection.getLineId(), previousSection.getUpStationId(),
                 laterSection.getDownStationId(), distance);
@@ -139,6 +141,24 @@ public class Sections {
         sections.add(newSection);
         sections.remove(previousSection);
         sections.remove(laterSection);
+    }
+
+    private Section findPreviousSection(Long stationId) {
+        return sections.stream()
+                .filter(section -> section.isSameDownStation(stationId))
+                .findAny()
+                .orElseThrow(() -> new IllegalSectionException(
+                        "삭제 이후 연결할 상행역이 존재하지 않아 구간 삭제가 불가능합니다."
+                ));
+    }
+
+    private Section findLaterSection(Long stationId) {
+        return sections.stream()
+                .filter(section -> section.isSameUpStation(stationId))
+                .findAny()
+                .orElseThrow(() -> new IllegalSectionException(
+                        "삭제 이후연결할 하행역이 존재하지 않아 구간 삭제가 불가능합니다."
+                ));
     }
 
     public List<Section> getSections() {
