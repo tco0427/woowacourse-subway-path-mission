@@ -1,22 +1,17 @@
 package wooteco.subway.dao.jdbc;
 
-import static java.util.stream.Collectors.toList;
-
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import wooteco.subway.dao.LineDao;
 import wooteco.subway.domain.Line;
-import wooteco.subway.domain.Section;
 
 @Repository
 public class JdbcLineDao implements LineDao {
@@ -27,39 +22,37 @@ public class JdbcLineDao implements LineDao {
             resultSet.getString("color"),
             resultSet.getInt("extraFare")
     );
+    private static final String LINE_TABLE_NAME = "line";
+    private static final String GENERATE_KEY_COLUMN = "id";
 
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedJdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
 
     public JdbcLineDao(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName(LINE_TABLE_NAME)
+                .usingGeneratedKeyColumns(GENERATE_KEY_COLUMN);
     }
 
     @Override
     public Line save(Line line) {
-        String sql = "INSERT INTO line (name, color, extraFare) VALUES(?, ?, ?)";
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("name", line.getName());
+        parameterSource.addValue("color", line.getColor());
+        parameterSource.addValue("extraFare", line.getExtraFare());
 
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            final PreparedStatement statement = connection.prepareStatement(sql, new String[]{"id"});
-            statement.setString(1, line.getName());
-            statement.setString(2, line.getColor());
-            statement.setInt(3, line.getExtraFare());
-            return statement;
-        }, keyHolder);
-
-        final Long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        final Long id = simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
 
         return new Line(id, line.getName(), line.getColor());
     }
 
     @Override
     public Optional<Line> findById(Long id) {
-        String sql = "SELECT * FROM line WHERE id = ?";
+        String sql = "SELECT * FROM line WHERE id = :id";
 
         try {
-            final Line line = jdbcTemplate.queryForObject(sql, LINE_ROW_MAPPER, id);
+            final Line line = jdbcTemplate.queryForObject(sql, Map.of("id", id), LINE_ROW_MAPPER);
             return Optional.ofNullable(line);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
@@ -70,7 +63,7 @@ public class JdbcLineDao implements LineDao {
     public List<Line> findAllByIds(List<Long> ids) {
         final String sql = "SELECT * FROM line WHERE id IN (:ids)";
 
-        return namedJdbcTemplate.query(sql, Map.of("ids", ids), LINE_ROW_MAPPER);
+        return jdbcTemplate.query(sql, Map.of("ids", ids), LINE_ROW_MAPPER);
     }
 
     @Override
@@ -82,21 +75,20 @@ public class JdbcLineDao implements LineDao {
 
     @Override
     public Long updateByLine(Line line) {
-        String sql = "UPDATE line SET name = ?, color = ? WHERE id = ?";
+        String sql = "UPDATE line SET name = :name, color = :color WHERE id = :id";
 
-        jdbcTemplate.update(sql, line.getName(), line.getColor(), line.getId());
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("name", line.getName());
+        parameterSource.addValue("color", line.getColor());
+        parameterSource.addValue("id", line.getId());
+
+        jdbcTemplate.update(sql, parameterSource);
         return line.getId();
     }
 
     @Override
     public int deleteById(Long id) {
-        String sql = "DELETE FROM line WHERE id = ?";
-        return jdbcTemplate.update(sql, id);
-    }
-
-    private List<Long> getLineIds(List<Section> sections) {
-        return sections.stream()
-                .map(Section::getLineId)
-                .collect(toList());
+        String sql = "DELETE FROM line WHERE id = :id";
+        return jdbcTemplate.update(sql, Map.of("id", id));
     }
 }
