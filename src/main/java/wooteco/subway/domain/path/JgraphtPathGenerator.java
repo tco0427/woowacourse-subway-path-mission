@@ -16,14 +16,12 @@ import wooteco.subway.domain.SectionEdge;
 @Component
 public class JgraphtPathGenerator implements PathGenerator {
 
-    private final WeightedMultigraph<Long, SectionEdge> graph;
-
     public JgraphtPathGenerator() {
-        this.graph = new WeightedMultigraph<>(SectionEdge.class);
     }
 
     @Override
     public Path generatePath(List<Section> sections, Long sourceId, Long targetId) {
+        final WeightedMultigraph<Long, SectionEdge> graph = new WeightedMultigraph<>(SectionEdge.class);
         addVertexes(graph, getStationIds(sections));
         addEdges(graph, sections);
 
