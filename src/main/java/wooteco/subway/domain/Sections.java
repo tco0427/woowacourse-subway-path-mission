@@ -115,11 +115,11 @@ public class Sections {
     }
 
     private void removeFirstOrLastSection(boolean existPreviousSection, boolean existLaterSection) {
-        if (existPreviousSection && !existLaterSection) {
+        if (!existPreviousSection && existLaterSection) {
             sections.remove(0);
             return;
         }
-        if (!existPreviousSection && existLaterSection) {
+        if (existPreviousSection && !existLaterSection) {
             sections.remove(sections.size() - 1);
         }
     }
