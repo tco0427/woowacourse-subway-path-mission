@@ -1,5 +1,6 @@
 package wooteco.subway.dao.jdbc;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -121,12 +122,20 @@ class JdbcLineDaoTest {
                 new Section(4L, lineId3, 5L, 6L, 10)
         );
 
+        final List<Long> lineIds = getLineIds(sampleSections);
+
         // when
-        final List<Line> lines = jdbcLineDao.findAllBySections(sampleSections);
+        final List<Line> lines = jdbcLineDao.findAllByIds(lineIds);
 
         // then
         assertThat(lines).hasSize(3)
                 .extracting("id")
                 .contains(lineId1, lineId2, lineId3);
+    }
+
+    private List<Long> getLineIds(List<Section> sampleSections) {
+        return sampleSections.stream()
+                .map(Section::getLineId)
+                .collect(toList());
     }
 }

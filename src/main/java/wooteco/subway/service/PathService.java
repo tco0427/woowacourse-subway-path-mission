@@ -63,12 +63,19 @@ public class PathService {
     }
 
     private int getMaxExtraFareWithLine(List<Section> sections) {
-        final List<Line> lines = lineDao.findAllBySections(sections);
+        final List<Long> lineIds = getLineIds(sections);
+        final List<Line> lines = lineDao.findAllByIds(lineIds);
 
         return lines.stream()
                 .mapToInt(Line::getExtraFare)
                 .max()
                 .orElse(0);
+    }
+
+    private List<Long> getLineIds(List<Section> sections) {
+        return sections.stream()
+                .map(Section::getLineId)
+                .collect(toList());
     }
 
     private Station findStation(Long id) {

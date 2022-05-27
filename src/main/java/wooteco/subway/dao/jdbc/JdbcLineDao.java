@@ -3,13 +3,14 @@ package wooteco.subway.dao.jdbc;
 import static java.util.stream.Collectors.toList;
 
 import java.sql.PreparedStatement;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -28,9 +29,11 @@ public class JdbcLineDao implements LineDao {
     );
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     public JdbcLineDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
 
     @Override
@@ -64,13 +67,10 @@ public class JdbcLineDao implements LineDao {
     }
 
     @Override
-    public List<Line> findAllBySections(List<Section> sections) {
-        final List<Long> lineIds = getLineIds(sections);
+    public List<Line> findAllByIds(List<Long> ids) {
+        final String sql = "SELECT * FROM line WHERE id IN (:ids)";
 
-        final String inSql = String.join(",", Collections.nCopies(lineIds.size(), "?"));
-        final String sql = String.format("SELECT * FROM line WHERE id IN (%s)", inSql);
-
-        return jdbcTemplate.query(sql, lineIds.toArray(), LINE_ROW_MAPPER);
+        return namedJdbcTemplate.query(sql, Map.of("ids", ids), LINE_ROW_MAPPER);
     }
 
     @Override
