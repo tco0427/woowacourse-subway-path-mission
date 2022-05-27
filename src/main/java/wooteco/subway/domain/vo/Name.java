@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class Name {
 
+    private static final int MAX_NAME_LENGTH = 255;
+
     private final String name;
 
     private Name(String name) {
@@ -28,7 +30,7 @@ public class Name {
     }
 
     private static void validateLength(String name) {
-        if (name.length() > 255) {
+        if (name.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("이름은 255자 보다 클 수 없습니다.");
         }
     }

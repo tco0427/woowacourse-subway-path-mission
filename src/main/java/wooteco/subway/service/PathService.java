@@ -23,6 +23,8 @@ import wooteco.subway.exception.NotExistException;
 @Transactional
 public class PathService {
 
+    private static final int NO_EXTRA_FARE = 0;
+
     private final StationDao stationDao;
     private final SectionDao sectionDao;
     private final LineDao lineDao;
@@ -69,7 +71,7 @@ public class PathService {
         return lines.stream()
                 .mapToInt(Line::getExtraFare)
                 .max()
-                .orElse(0);
+                .orElse(NO_EXTRA_FARE);
     }
 
     private List<Long> getLineIds(List<Section> sections) {

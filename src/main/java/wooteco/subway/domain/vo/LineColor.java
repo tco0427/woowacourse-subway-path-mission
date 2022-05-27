@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class LineColor {
 
+    private static final int MAX_COLOR_LENGTH = 20;
+
     private final String color;
 
     private LineColor(String color) {
@@ -28,7 +30,7 @@ public class LineColor {
     }
 
     private static void validateLength(String color) {
-        if (color.length() > 20) {
+        if (color.length() > MAX_COLOR_LENGTH) {
             throw new IllegalArgumentException("노선의 색이 20자 보다 클 수 없습니다.");
         }
     }
