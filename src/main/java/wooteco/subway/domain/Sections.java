@@ -121,7 +121,7 @@ public class Sections {
             return;
         }
         if (laterSection == null) {
-            sections.remove(sections.size()-1);
+            sections.remove(sections.size() - 1);
         }
     }
 

@@ -29,7 +29,7 @@ public class Fare {
     public int calculate() {
         final int calculateWithoutDiscount = calculateWithoutDiscount();
         final AgeSection ageSection = AgeSection.from(age);
-        final int discount = ageSection.getDiscount(calculateWithoutDiscount);
+        final int discount = ageSection.calculateDiscount(calculateWithoutDiscount);
 
         return calculateWithoutDiscount - discount;
     }

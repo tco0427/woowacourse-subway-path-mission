@@ -26,7 +26,7 @@ public enum AgeSection {
                 .orElseThrow(() -> new IllegalArgumentException("일치하는 연령대가 없습니다."));
     }
 
-    public int getDiscount(int fare) {
+    public int calculateDiscount(int fare) {
         final int deductedAmount = fare - DEDUCT;
         return (int) (deductedAmount * discountRate);
     }
