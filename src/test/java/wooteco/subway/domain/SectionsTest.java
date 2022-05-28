@@ -12,14 +12,21 @@ import wooteco.subway.exception.IllegalSectionException;
 
 class SectionsTest {
 
+    private static final Line line1 = new Line(1L, "2호선", "bg-green-600");
+    private static final Station station1 = new Station(1L, "서울대입구역");
+    private static final Station station2 = new Station(2L, "낙성대역");
+    private static final Station station3 = new Station(3L, "사당역");
+    private static final Station station4 = new Station(4L, "교대역");
+    private static final Station station5 = new Station(5L, "서초역");
+
     @DisplayName("새로 등록할 구간의 상행역과 하행역 중 노선에 이미 등록되어있는 역을 기준으로 새로운 구간을 추가한다.")
     @Test
     public void addNewSection() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 2L, 3L, 1);
+        final Sections sections = makeSectionsBySingleSection(line1, station2, station3, 1);
 
         // when & then
-        final Section section = new Section(1L, 1L, 2L, 1);
+        final Section section = new Section(line1, station1, station2, 1);
         assertDoesNotThrow(() -> sections.add(section));
     }
     
@@ -27,10 +34,10 @@ class SectionsTest {
     @Test
     public void forkRodeSameUpStation() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
+        final Sections sections = makeSectionsBySingleSection(line1, station1, station3, 7);
 
         // when
-        final Section section = new Section(1L, 1L, 2L, 4);
+        final Section section = new Section(line1, station1, station2, 4);
         sections.add(section);
 
         // then
@@ -44,10 +51,10 @@ class SectionsTest {
     @Test
     public void forkRodeSameDownStation() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
+        final Sections sections = makeSectionsBySingleSection(line1, station1, station3, 7);
 
         // when
-        final Section section = new Section(1L, 2L, 3L, 4);
+        final Section section = new Section(line1, station2, station3, 4);
         sections.add(section);
 
         // then
@@ -61,10 +68,10 @@ class SectionsTest {
     @Test
     public void checkDistance() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 1L, 1L, 3L, 7);
+        final Sections sections = makeSectionsBySingleSection(1L, line1, station1, station3, 7);
 
         // when & then
-        final Section section = new Section(2L, 1L, 1L, 2L, 7);
+        final Section section = new Section(2L, line1, station1, station2, 7);
         assertThatThrownBy(() -> sections.add(section))
                         .isInstanceOf(IllegalSectionException.class);
     }
@@ -73,10 +80,10 @@ class SectionsTest {
     @Test
     public void sameSection() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 1L, 1L, 3L, 7);
+        final Sections sections = makeSectionsBySingleSection(1L, line1, station1, station3, 7);
 
         // when & then
-        final Section section = new Section(2L,1L, 1L, 3L, 7);
+        final Section section = new Section(2L,line1, station1, station3, 7);
         assertThatThrownBy(() -> sections.add(section))
                 .isInstanceOf(IllegalSectionException.class);
     }
@@ -86,12 +93,12 @@ class SectionsTest {
     public void IllegalAddSection() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(1L, 2L, 3L, 4),
-                new Section(1L, 1L, 2L, 3)
+                new Section(line1, station2, station3, 4),
+                new Section(line1, station1, station2, 3)
         ));
 
         // when & then
-        final Section section = new Section(1L, 4L, 5L, 7);
+        final Section section = new Section(line1, station4, station5, 7);
         assertThatThrownBy(() -> sections.add(section))
                 .isInstanceOf(IllegalSectionException.class);
         assertThat(sections.getSections().size()).isEqualTo(2);
@@ -102,31 +109,31 @@ class SectionsTest {
     public void deleteSection() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 2L, 3),
-                new Section(1L, 2L, 3L, 4)
+                new Section(line1, station1, station2, 3),
+                new Section(line1, station2, station3, 4)
         ));
 
         // when
         final Station station = new Station(2L, "중간역");
-        sections.delete(station.getId());
+        sections.delete(station);
 
         // then
         assertThat(sections.getSections().size()).isEqualTo(1);
         final Section section = sections.getSections().get(0);
         assertThat(section.getDistance()).isEqualTo(7);
-        assertThat(section.getUpStationId()).isEqualTo(1L);
-        assertThat(section.getDownStationId()).isEqualTo(3L);
+        assertThat(section.getUpStation()).isEqualTo(station1);
+        assertThat(section.getDownStation()).isEqualTo(station3);
     }
 
     @DisplayName("구간이 하나인 노선에서 마지막 구간을 제거할 수 없다.")
     @Test
     public void IllegalDeleteSection() {
         // given
-        final Sections sections = makeSectionsBySingleSection(1L, 1L, 3L, 7);
+        final Sections sections = makeSectionsBySingleSection(line1, station1, station3, 7);
 
         // when & then
         final Station station = new Station(1L, "상행역");
-        assertThatThrownBy(() -> sections.delete(station.getId()))
+        assertThatThrownBy(() -> sections.delete(station))
                 .isInstanceOf(IllegalSectionException.class);
     }
 
@@ -135,21 +142,21 @@ class SectionsTest {
     public void deleteFirstSection() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 2L, 7),
-                new Section(1L, 2L, 3L, 7)
+                new Section(line1, station1, station2, 7),
+                new Section(line1, station2, station3, 7)
         ));
 
         final Station deleteStation = new Station(1L, "첫번째역");
 
         // when
-        sections.delete(deleteStation.getId());
+        sections.delete(deleteStation);
 
         //then
         assertThat(sections.getSections().size()).isEqualTo(1);
         final Section section = sections.getSections().get(0);
         assertThat(section.getDistance()).isEqualTo(7);
-        assertThat(section.getUpStationId()).isEqualTo(2L);
-        assertThat(section.getDownStationId()).isEqualTo(3L);
+        assertThat(section.getUpStation()).isEqualTo(station2);
+        assertThat(section.getDownStation()).isEqualTo(station3);
     }
 
     @DisplayName("마지막 순서의 역을 삭제할 수 있다.")
@@ -157,21 +164,21 @@ class SectionsTest {
     public void deleteLastSection() {
         // given
         final Sections sections = new Sections(List.of(
-                new Section(1L, 1L, 2L, 7),
-                new Section(1L, 2L, 3L, 7)
+                new Section(line1, station1, station2, 7),
+                new Section(line1, station2, station3, 7)
         ));
 
         final Station deleteStation = new Station(3L, "마지막역");
 
         // when
-        sections.delete(deleteStation.getId());
+        sections.delete(deleteStation);
 
         //then
         assertThat(sections.getSections().size()).isEqualTo(1);
         final Section section = sections.getSections().get(0);
         assertThat(section.getDistance()).isEqualTo(7);
-        assertThat(section.getUpStationId()).isEqualTo(1L);
-        assertThat(section.getDownStationId()).isEqualTo(2L);
+        assertThat(section.getUpStation()).isEqualTo(station1);
+        assertThat(section.getDownStation()).isEqualTo(station2);
     }
 
     @DisplayName("상행부터 하행의 순서로 정렬된 구간들을 구할 수 있다.")
@@ -179,10 +186,10 @@ class SectionsTest {
     public void sortedSection() {
         //given
         final Sections sections = new Sections(List.of(
-                new Section(1L, 4L, 5L, 3),
-                new Section(1L, 1L, 2L, 3),
-                new Section(1L, 3L, 4L, 4),
-                new Section(1L, 2L, 3L, 4)
+                new Section(line1, station4, station5, 3),
+                new Section(line1, station1, station2, 3),
+                new Section(line1, station3, station4, 4),
+                new Section(line1, station2, station3, 4)
         ));
 
         //when
@@ -190,24 +197,24 @@ class SectionsTest {
 
         //then
         assertThat(sortedSections).hasSize(4)
-                .extracting("upStationId", "downStationId")
+                .extracting("upStation", "downStation")
                 .containsExactly(
-                        tuple(1L, 2L),
-                        tuple(2L, 3L),
-                        tuple(3L, 4L),
-                        tuple(4L, 5L)
+                        tuple(station1, station2),
+                        tuple(station2, station3),
+                        tuple(station3, station4),
+                        tuple(station4, station5)
                 );
     }
 
-    private Sections makeSectionsBySingleSection(Long id, Long lineId, Long upStationId, Long downStationId, int distance) {
+    private Sections makeSectionsBySingleSection(Long id, Line line, Station upStation, Station downStation, int distance) {
         return new Sections(List.of(
-                new Section(id, lineId, upStationId, downStationId, distance)
+                new Section(id, line, upStation, downStation, distance)
         ));
     }
 
-    private Sections makeSectionsBySingleSection(Long lineId, Long upStationId, Long downStationId, int distance) {
+    private Sections makeSectionsBySingleSection(Line line, Station upStation, Station downStation, int distance) {
         return new Sections(List.of(
-                new Section(lineId, upStationId, downStationId, distance)
+                new Section(line, upStation, downStation, distance)
         ));
     }
 }

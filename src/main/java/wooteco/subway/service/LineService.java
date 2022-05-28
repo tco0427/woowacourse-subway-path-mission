@@ -3,9 +3,10 @@ package wooteco.subway.service;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.dao.LineDao;
@@ -40,8 +41,9 @@ public class LineService {
         Line line = new Line(request.getName(), request.getColor(), request.getExtraFare());
         final Line savedLine = lineDao.save(line);
 
-        final Section section = new Section(savedLine.getId(), request.getUpStationId(), request.getDownStationId(),
-                request.getDistance());
+        final Station upStation = findStationById(request.getUpStationId());
+        final Station downStation = findStationById(request.getDownStationId());
+        final Section section = new Section(savedLine, upStation, downStation, request.getDistance());
         sectionDao.save(section);
 
         return new LineResponse(savedLine, makeStationResponseList(request));
@@ -49,9 +51,7 @@ public class LineService {
 
     @Transactional(readOnly = true)
     public LineResponse findById(Long id) {
-        final Line line = lineDao.findById(id)
-                .orElseThrow(() -> new NotExistException("찾으려는 노선이 존재하지 않습니다."));
-
+        final Line line = findLineById(id);
         final Sections sections = new Sections(sectionDao.findByLineId(line.getId()));
 
         return new LineResponse(line, sortedStations(sections));
@@ -80,8 +80,8 @@ public class LineService {
     }
 
     private List<StationResponse> makeStationResponseList(LineRequest request) {
-        final Station upStation = getStationById(request.getUpStationId());
-        final Station downStation = getStationById(request.getDownStationId());
+        final Station upStation = findStationById(request.getUpStationId());
+        final Station downStation = findStationById(request.getDownStationId());
 
         final StationResponse upStationResponse = new StationResponse(upStation);
         final StationResponse downStationResponse = new StationResponse(downStation);
@@ -89,9 +89,14 @@ public class LineService {
         return List.of(upStationResponse, downStationResponse);
     }
 
-    private Station getStationById(Long id) {
+    private Station findStationById(Long id) {
         return stationDao.findById(id)
                 .orElseThrow(() -> new NotExistException("찾으려는 역이 존재하지 않습니다."));
+    }
+
+    private Line findLineById(Long id) {
+        return lineDao.findById(id)
+                .orElseThrow(() -> new NotExistException("찾으려는 노선이 존재하지 않습니다."));
     }
 
     private Sections getSections(Line line) {
@@ -101,24 +106,25 @@ public class LineService {
     }
 
     private List<StationResponse> sortedStations(Sections sections) {
-        final List<Long> stationIds = getStationIds(sections.getSections());
-        final List<Station> stations = stationDao.findAllByIds(stationIds);
+        final List<Station> stations = getStations(sections.getSections());
+        stations.sort(Comparator.comparing(Station::getId));
+        return makeStationResponse(stations);
+    }
 
+    private List<Station> getStations(List<Section> sections) {
+        Set<Station> stations = new HashSet<>();
+        for (Section section : sections) {
+            stations.add(section.getUpStation());
+            stations.add(section.getDownStation());
+        }
+        return new ArrayList<>(stations);
+    }
+
+    private List<StationResponse> makeStationResponse(List<Station> stations) {
         List<StationResponse> stationResponses = new ArrayList<>();
-
         for (Station station : stations) {
             stationResponses.add(new StationResponse(station));
         }
-
         return stationResponses;
-    }
-
-    private List<Long> getStationIds(List<Section> sections) {
-        Set<Long> stationIds = new TreeSet<>();
-        for (Section section : sections) {
-            stationIds.add(section.getUpStationId());
-            stationIds.add(section.getDownStationId());
-        }
-        return new ArrayList<>(stationIds);
     }
 }

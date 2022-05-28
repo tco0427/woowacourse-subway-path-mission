@@ -5,28 +5,28 @@ import wooteco.subway.exception.IllegalSectionException;
 public class Section {
 
     private final Long id;
-    private final Long lineId;
-    private final Long upStationId;
-    private final Long downStationId;
+    private final Line line;
+    private final Station upStation;
+    private final Station downStation;
     private final int distance;
 
-    public Section(Long lineId, Long upStationId, Long downStationId, int distance) {
-        this(null, lineId, upStationId, downStationId, distance);
+    public Section(Line line, Station upStation, Station downStation, int distance) {
+        this(null, line, upStation, downStation, distance);
     }
 
-    public Section(Long id, Long lineId, Long upStationId, Long downStationId, int distance) {
-        validateSection(upStationId, downStationId, distance);
+    public Section(Long id, Line line, Station upStation, Station downStation, int distance) {
+        validateSection(upStation, downStation, distance);
 
         this.id = id;
-        this.lineId = lineId;
-        this.upStationId = upStationId;
-        this.downStationId = downStationId;
+        this.line = line;
+        this.upStation = upStation;
+        this.downStation = downStation;
         this.distance = distance;
     }
 
-    private void validateSection(Long upStationId, Long downStationId, int distance) {
+    private void validateSection(Station upStation, Station downStation, int distance) {
         checkNegativeDistance(distance);
-        checkSameStation(upStationId, downStationId);
+        checkSameStation(upStation, downStation);
     }
 
     private void checkNegativeDistance(int distance) {
@@ -35,47 +35,47 @@ public class Section {
         }
     }
 
-    private void checkSameStation(Long upStationId, Long downStationId) {
-        if (upStationId.equals(downStationId)) {
+    private void checkSameStation(Station upStation, Station downStation) {
+        if (upStation.equals(downStation)) {
             throw new IllegalSectionException("구간의 두 역이 같을 수 없습니다.");
         }
     }
 
     public boolean containsStation(Section section) {
-        return upStationId.equals(section.getDownStationId()) || downStationId.equals(section.getUpStationId());
+        return upStation.equals(section.getDownStation()) || downStation.equals(section.getUpStation());
     }
 
     public boolean isFork(Section section) {
-        return upStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId());
+        return upStation.equals(section.getUpStation()) || downStation.equals(section.getDownStation());
     }
 
     public boolean isSameSection(Section section) {
-        return (upStationId.equals(section.getUpStationId()) || upStationId.equals(section.getDownStationId()))
-                && (downStationId.equals(section.getUpStationId()) || downStationId.equals(section.getDownStationId()));
+        return (upStation.equals(section.getUpStation()) || upStation.equals(section.getDownStation()))
+                && (downStation.equals(section.getUpStation()) || downStation.equals(section.getDownStation()));
     }
 
-    public boolean isSameUpStation(Long stationId) {
-        return getUpStationId().equals(stationId);
+    public boolean isSameUpStation(Station station) {
+        return getUpStation().equals(station);
     }
 
-    public boolean isSameDownStation(Long stationId) {
-        return getDownStationId().equals(stationId);
+    public boolean isSameDownStation(Station station) {
+        return getDownStation().equals(station);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getLineId() {
-        return lineId;
+    public Line getLine() {
+        return line;
     }
 
-    public Long getUpStationId() {
-        return upStationId;
+    public Station getUpStation() {
+        return upStation;
     }
 
-    public Long getDownStationId() {
-        return downStationId;
+    public Station getDownStation() {
+        return downStation;
     }
 
     public int getDistance() {

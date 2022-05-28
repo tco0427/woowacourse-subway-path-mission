@@ -12,24 +12,35 @@ import wooteco.subway.domain.path.Path;
 
 class PathTest {
 
+    private final static Line line1 = new Line(1L, "2호선", "bg-green-600");
+    private final static Line line2 = new Line(2L, "신분당선", "bg-red-600");
+
+    private final static Station station1 = new Station(1L, "A");
+    private final static Station station2 = new Station(2L, "B");
+    private final static Station station3 = new Station(3L, "C");
+    private final static Station station4 = new Station(4L, "D");
+    private final static Station station5 = new Station(5L, "E");
+    private final static Station station6 = new Station(6L, "F");
+    private final static Station station7 = new Station(7L, "G");
+
     private final static List<Section> SAMPLE_SECTIONS = List.of(
-            new Section(1L, 1L, 1L, 2L, 1),
-            new Section(2L, 1L, 2L, 5L, 2),
-            new Section(3L, 1L, 5L, 6L, 2),
-            new Section(4L, 1L, 6L, 7L, 1),
-            new Section(5L, 2L, 2L, 3L, 1),
-            new Section(6L, 2L, 3L, 4L, 1),
-            new Section(7L, 2L, 4L, 6L, 1)
+            new Section(1L, line1, station1, station2, 1),
+            new Section(2L, line1, station2, station5, 2),
+            new Section(3L, line1, station5, station6, 2),
+            new Section(4L, line1, station6, station7, 1),
+            new Section(5L, line2, station2, station3, 1),
+            new Section(6L, line2, station3, station4, 1),
+            new Section(7L, line2, station4, station6, 1)
     );
 
     private final static List<Section> ANOTHER_SAMPLE_SECTIONS = List.of(
-            new Section(1L, 1L, 1L, 2L, 1),
-            new Section(2L, 1L, 2L, 5L, 2),
-            new Section(3L, 1L, 5L, 7L, 2),
-            new Section(4L, 1L, 7L, 6L, 1),
-            new Section(5L, 2L, 2L, 4L, 1),
-            new Section(6L, 2L, 4L, 3L, 1),
-            new Section(7L, 2L, 3L, 7L, 1)
+            new Section(1L, line1, station1, station2, 1),
+            new Section(2L, line1, station2, station5, 2),
+            new Section(3L, line1, station5, station7, 2),
+            new Section(4L, line1, station7, station6, 1),
+            new Section(5L, line2, station2, station4, 1),
+            new Section(6L, line2, station4, station3, 1),
+            new Section(7L, line2, station3, station7, 1)
     );
 
     @DisplayName("한 노선에서 구간과 역 정보를 통해 최단 경로를 구할 수 있다.")
@@ -37,20 +48,20 @@ class PathTest {
     public void getShortestPath() {
         // given
         List<Section> sections = new ArrayList<>();
-        sections.add(new Section(1L, 1L, 4L, 5L, 3));
-        sections.add(new Section(2L, 1L, 1L, 2L, 3));
-        sections.add(new Section(3L, 1L, 3L, 4L, 4));
-        sections.add(new Section(4L, 1L, 2L, 3L, 4));
+        sections.add(new Section(1L, line1, station4, station5, 3));
+        sections.add(new Section(2L, line1, station1, station2, 3));
+        sections.add(new Section(3L, line1, station3, station4, 4));
+        sections.add(new Section(4L, line1, station2, station3, 4));
 
         final JgraphtPathGenerator pathGenerator = new JgraphtPathGenerator();
-        final Path path = pathGenerator.generatePath(sections, 1L, 5L);
+        final Path path = pathGenerator.generatePath(sections, station1, station5);
 
         // when
-        List<Long> shortestPath = path.getShortestPath();
+        List<Station> shortestPath = path.getShortestPath();
         final int weight = path.getShortestPathWeight();
 
         // then
-        assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 5L);
+        assertThat(shortestPath).containsExactly(station1, station2, station3, station4, station5);
         assertThat(weight).isEqualTo(14);
     }
 
@@ -59,14 +70,14 @@ class PathTest {
     public void getShortestPath2() {
         // given
         final JgraphtPathGenerator pathGenerator = new JgraphtPathGenerator();
-        final Path path = pathGenerator.generatePath(SAMPLE_SECTIONS, 1L, 7L);
+        final Path path = pathGenerator.generatePath(SAMPLE_SECTIONS, station1, station7);
 
         // when
-        List<Long> shortestPath = path.getShortestPath();
+        List<Station> shortestPath = path.getShortestPath();
         final int weight = path.getShortestPathWeight();
 
         // then
-        assertThat(shortestPath).containsExactly(1L, 2L, 3L, 4L, 6L, 7L);
+        assertThat(shortestPath).containsExactly(station1, station2, station3, station4, station6, station7);
         assertThat(weight).isEqualTo(5);
     }
 
@@ -75,14 +86,14 @@ class PathTest {
     public void getShortestPath3() {
         // given
         final JgraphtPathGenerator pathGenerator = new JgraphtPathGenerator();
-        final Path path = pathGenerator.generatePath(ANOTHER_SAMPLE_SECTIONS, 1L, 6L);
+        final Path path = pathGenerator.generatePath(ANOTHER_SAMPLE_SECTIONS, station1, station6);
 
         // when
-        List<Long> shortestPath = path.getShortestPath();
+        List<Station> shortestPath = path.getShortestPath();
         final int weight = path.getShortestPathWeight();
 
         // then
-        assertThat(shortestPath).containsExactly(1L, 2L, 4L, 3L, 7L, 6L);
+        assertThat(shortestPath).containsExactly(station1, station2, station4, station3, station7, station6);
         assertThat(weight).isEqualTo(5);
     }
 
@@ -91,20 +102,20 @@ class PathTest {
     public void getShortestEdge() {
         // given
         final JgraphtPathGenerator pathGenerator = new JgraphtPathGenerator();
-        final Path path = pathGenerator.generatePath(ANOTHER_SAMPLE_SECTIONS, 1L, 6L);
+        final Path path = pathGenerator.generatePath(ANOTHER_SAMPLE_SECTIONS, station1, station6);
 
         // when
         final List<Section> shortestEdge = path.getShortestEdge();
 
         // then
         assertThat(shortestEdge).hasSize(5)
-                .extracting("id", "upStationId", "downStationId")
+                .extracting("id", "upStation", "downStation")
                 .containsExactly(
-                        tuple(1L, 1L, 2L),
-                        tuple(5L, 2L, 4L),
-                        tuple(6L, 4L, 3L),
-                        tuple(7L, 3L, 7L),
-                        tuple(4L, 7L, 6L)
+                        tuple(1L, station1, station2),
+                        tuple(5L, station2, station4),
+                        tuple(6L, station4, station3),
+                        tuple(7L, station3, station7),
+                        tuple(4L, station7, station6)
                 );
     }
 }

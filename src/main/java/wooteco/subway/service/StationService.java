@@ -32,9 +32,9 @@ public class StationService {
     public StationResponse save(StationRequest request) {
         final Station station = new Station(request.getName());
 
-        final Long savedId = stationDao.save(station);
+        final Station savedStation = stationDao.save(station);
 
-        return new StationResponse(savedId, station.getName());
+        return new StationResponse(savedStation.getId(), savedStation.getName());
     }
 
     @Transactional(readOnly = true)
@@ -60,8 +60,8 @@ public class StationService {
 
     private void getStationIds(Set<Long> stationIds, List<Section> sections) {
         for (Section section : sections) {
-            final Long upStationId = section.getUpStationId();
-            final Long downStationId = section.getDownStationId();
+            final Long upStationId = section.getUpStation().getId();
+            final Long downStationId = section.getDownStation().getId();
 
             stationIds.add(upStationId);
             stationIds.add(downStationId);

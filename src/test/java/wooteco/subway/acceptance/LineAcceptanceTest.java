@@ -142,6 +142,15 @@ class LineAcceptanceTest extends AcceptanceTest {
         return param.header("Location").split("/")[2];
     }
 
+    private Long createStationByName(String name) {
+        final StationRequest stationRequest = new StationRequest(name);
+        final ExtractableResponse<Response> stationResponse = AcceptanceFixture.post(stationRequest, "/stations");
+
+        return stationResponse.jsonPath()
+                .getObject(".", StationResponse.class)
+                .getId();
+    }
+
     private Long extractId(ExtractableResponse<Response> response) {
         return response.jsonPath()
                 .getObject(".", LineResponse.class)
@@ -152,14 +161,5 @@ class LineAcceptanceTest extends AcceptanceTest {
         return response.jsonPath().getList(".", LineResponse.class).stream()
                 .map(LineResponse::getId)
                 .collect(toList());
-    }
-
-    private Long createStationByName(String name) {
-        final StationRequest stationRequest = new StationRequest(name);
-        final ExtractableResponse<Response> stationResponse = AcceptanceFixture.post(stationRequest, "/stations");
-
-        return stationResponse.jsonPath()
-                .getObject(".", StationResponse.class)
-                .getId();
     }
 }

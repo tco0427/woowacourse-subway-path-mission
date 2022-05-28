@@ -2,17 +2,16 @@ package wooteco.subway.service;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import wooteco.subway.dao.LineDao;
 import wooteco.subway.dao.SectionDao;
 import wooteco.subway.dao.StationDao;
-import wooteco.subway.domain.fare.Fare;
 import wooteco.subway.domain.Line;
 import wooteco.subway.domain.Section;
 import wooteco.subway.domain.Station;
+import wooteco.subway.domain.fare.Fare;
 import wooteco.subway.domain.path.Path;
 import wooteco.subway.domain.path.PathGenerator;
 import wooteco.subway.dto.PathResponse;
@@ -40,9 +39,11 @@ public class PathService {
     @Transactional(readOnly = true)
     public PathResponse findPath(Long sourceId, Long targetId, Integer age) {
         final List<Section> sections = sectionDao.findAll();
-        final Path path = pathGenerator.generatePath(sections, sourceId, targetId);
+        final Station sourceStation = findStation(sourceId);
+        final Station targetStation = findStation(targetId);
+        final Path path = pathGenerator.generatePath(sections, sourceStation, targetStation);
 
-        final List<Long> shortestPath = path.getShortestPath();
+        final List<Station> shortestPath = path.getShortestPath();
         final List<StationResponse> stations = getStationResponses(shortestPath);
         final List<Section> shortestEdge = path.getShortestEdge();
 
@@ -53,13 +54,8 @@ public class PathService {
         return new PathResponse(stations, distance, fare.calculate());
     }
 
-    private List<StationResponse> getStationResponses(List<Long> shortestPath) {
-        final List<Station> stations = new ArrayList<>();
-        for (Long id : shortestPath) {
-            stations.add(findStation(id));
-        }
-
-        return stations.stream().sequential()
+    private List<StationResponse> getStationResponses(List<Station> shortestPath) {
+        return shortestPath.stream().sequential()
                 .map(StationResponse::new)
                 .collect(toList());
     }
@@ -76,7 +72,7 @@ public class PathService {
 
     private List<Long> getLineIds(List<Section> sections) {
         return sections.stream()
-                .map(Section::getLineId)
+                .map(section -> section.getLine().getId())
                 .collect(toList());
     }
 

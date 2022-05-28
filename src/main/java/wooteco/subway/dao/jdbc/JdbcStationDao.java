@@ -34,13 +34,13 @@ public class JdbcStationDao implements StationDao {
     }
 
     @Override
-    public Long save(Station station) {
-        String sql = "INSERT INTO station (name) values (?)";
-
+    public Station save(Station station) {
         MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("name", station.getName());
 
-        return simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
+        final long id = simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
+
+        return new Station(id, station.getName());
     }
 
     @Override

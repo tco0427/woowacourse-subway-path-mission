@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import wooteco.subway.domain.Line;
 import wooteco.subway.domain.Section;
+import wooteco.subway.domain.Station;
 
 @JdbcTest
 class JdbcLineDaoTest {
@@ -111,31 +112,30 @@ class JdbcLineDaoTest {
     @Test
     public void findAllBySections() {
         // given
-        final Long lineId1 = jdbcLineDao.save(new Line("분당선", "bg-green-600", 0)).getId();
-        final Long lineId2 = jdbcLineDao.save(new Line("신분당선", "bg-red-600", 0)).getId();
-        final Long lineId3 = jdbcLineDao.save(new Line("다른분당선", "bg-red-600", 0)).getId();
+        final Line line1 = jdbcLineDao.save(new Line("분당선", "bg-green-600", 0));
+        final Line line2 = jdbcLineDao.save(new Line("신분당선", "bg-red-600", 0));
+        final Line line3 = jdbcLineDao.save(new Line("다른분당선", "bg-red-600", 0));
 
         final List<Section> sampleSections = List.of(
-                new Section(1L, lineId1, 1L, 2L, 10),
-                new Section(2L, lineId1, 2L, 3L, 10),
-                new Section(3L, lineId2, 2L, 4L, 10),
-                new Section(4L, lineId3, 5L, 6L, 10)
+                new Section(1L, line1, new Station(1L, "A"), new Station(2L, "B"), 10),
+                new Section(2L, line1, new Station(2L, "B"), new Station(3L, "C"), 10),
+                new Section(3L, line2, new Station(2L, "B"), new Station(4L, "D"), 10),
+                new Section(4L, line3, new Station(5L, "E"), new Station(6L, "F"), 10)
         );
 
-        final List<Long> lineIds = getLineIds(sampleSections);
-
         // when
-        final List<Line> lines = jdbcLineDao.findAllByIds(lineIds);
+        final List<Line> lines = getLines(sampleSections);
 
         // then
         assertThat(lines).hasSize(3)
                 .extracting("id")
-                .contains(lineId1, lineId2, lineId3);
+                .contains(line1.getId(), line2.getId(), line3.getId());
     }
 
-    private List<Long> getLineIds(List<Section> sampleSections) {
-        return sampleSections.stream()
-                .map(Section::getLineId)
+    private List<Line> getLines(List<Section> sections) {
+        return sections.stream()
+                .map(Section::getLine)
+                .distinct()
                 .collect(toList());
     }
 }

@@ -13,9 +13,6 @@ import wooteco.subway.domain.Station;
 
 @JdbcTest
 class JdbcStationDaoTest {
-
-    private static final String FAIL_FIND_STATION = "fail";
-
     private final JdbcStationDao jdbcStationDao;
 
     @Autowired
@@ -30,12 +27,9 @@ class JdbcStationDaoTest {
         final Station station = new Station("지하철역이름");
 
         // when
-        final Long savedId = jdbcStationDao.save(station);
+        final Station savedStation = jdbcStationDao.save(station);
 
         // then
-        final Station savedStation = jdbcStationDao.findById(savedId)
-                .orElseGet(() -> new Station(FAIL_FIND_STATION));
-
         assertThat(station.getName()).isEqualTo(savedStation.getName());
     }
 
@@ -65,9 +59,9 @@ class JdbcStationDaoTest {
     void deleteById() {
         // given
         final Station station = new Station("지하철역이름");
-        final Long savedId = jdbcStationDao.save(station);
+        final Station savedStation = jdbcStationDao.save(station);
 
         // when & then
-        assertDoesNotThrow(() -> jdbcStationDao.deleteById(savedId));
+        assertDoesNotThrow(() -> jdbcStationDao.deleteById(savedStation.getId()));
     }
 }

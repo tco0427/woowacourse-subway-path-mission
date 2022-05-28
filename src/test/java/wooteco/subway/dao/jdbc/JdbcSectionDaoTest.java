@@ -32,19 +32,20 @@ class JdbcSectionDaoTest {
         // given
         final Station station1 = new Station("지하철역이름");
         final Station station2 = new Station("또다른지하철역이름");
-        final Long upStationId = jdbcStationDao.save(station1);
-        final Long downStationId = jdbcStationDao.save(station2);
+        final Station upStation = jdbcStationDao.save(station1);
+        final Station downStation = jdbcStationDao.save(station2);
 
         final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
         // when
-        final Section section = new Section(savedLine.getId(), upStationId, downStationId, 10);
+        final Section section = new Section(savedLine, upStation, downStation, 10);
         final Section savedSection = jdbcSectionDao.save(section);
 
         // then
-        assertThat(savedSection).extracting("upStationId", "downStationId", "distance")
-                .contains(upStationId, downStationId, 10);
+        assertThat(savedSection)
+                .extracting("upStation", "downStation", "distance")
+                .contains(upStation, downStation, 10);
     }
 
     @Test
@@ -53,13 +54,13 @@ class JdbcSectionDaoTest {
         // given
         final Station station1 = new Station("지하철역이름");
         final Station station2 = new Station("또다른지하철역이름");
-        final Long upStationId = jdbcStationDao.save(station1);
-        final Long downStationId = jdbcStationDao.save(station2);
+        final Station upStation = jdbcStationDao.save(station1);
+        final Station downStation = jdbcStationDao.save(station2);
 
         final Line line = new Line("신분당선", "bg-red-600", 0);
         final Line savedLine = jdbcLineDao.save(line);
 
-        final Section section = new Section(savedLine.getId(), upStationId, downStationId, 10);
+        final Section section = new Section(savedLine, upStation, downStation, 10);
         final Section savedSection = jdbcSectionDao.save(section);
 
         // when & then

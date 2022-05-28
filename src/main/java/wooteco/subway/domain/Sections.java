@@ -66,16 +66,16 @@ public class Sections {
     }
 
     private Section createNewSection(Section existingSection, Section newSection) {
-        if (existingSection.getUpStationId().equals(newSection.getUpStationId())) {
+        if (existingSection.getUpStation().equals(newSection.getUpStation())) {
             return new Section(existingSection.getId(),
-                    existingSection.getLineId(),
-                    newSection.getDownStationId(),
-                    existingSection.getDownStationId(),
+                    existingSection.getLine(),
+                    newSection.getDownStation(),
+                    existingSection.getDownStation(),
                     existingSection.getDistance() - newSection.getDistance());
         }
 
-        return new Section(existingSection.getId(), existingSection.getLineId(), existingSection.getUpStationId(),
-                newSection.getUpStationId(), existingSection.getDistance() - newSection.getDistance());
+        return new Section(existingSection.getId(), existingSection.getLine(), existingSection.getUpStation(),
+                newSection.getUpStation(), existingSection.getDistance() - newSection.getDistance());
     }
 
     private void validateRegistration(Section section) {
@@ -85,14 +85,14 @@ public class Sections {
                 .orElseThrow(() -> new IllegalSectionException("등록할 구간의 적어도 하나의 역은 등록되어 있어야 합니다."));
     }
 
-    public List<Section> delete(Long stationId) {
+    public List<Section> delete(Station station) {
         validateDeletableSize();
 
-        final boolean existPreviousSection = hasPreviousSection(stationId);
-        final boolean existLaterSection = hasLaterSection(stationId);
+        final boolean existPreviousSection = hasPreviousSection(station);
+        final boolean existLaterSection = hasLaterSection(station);
 
         removeFirstOrLastSection(existPreviousSection, existLaterSection);
-        removeMiddleSection(existPreviousSection, existLaterSection, stationId);
+        removeMiddleSection(existPreviousSection, existLaterSection, station);
 
         sections = sortSections(sections);
         return List.copyOf(sections);
@@ -104,14 +104,14 @@ public class Sections {
         }
     }
 
-    private boolean hasPreviousSection(Long stationId) {
+    private boolean hasPreviousSection(Station station) {
         return sections.stream()
-                .anyMatch(section -> section.isSameDownStation(stationId));
+                .anyMatch(section -> section.isSameDownStation(station));
     }
 
-    private boolean hasLaterSection(Long stationId) {
+    private boolean hasLaterSection(Station station) {
         return sections.stream()
-                .anyMatch(section -> section.isSameUpStation(stationId));
+                .anyMatch(section -> section.isSameUpStation(station));
     }
 
     private void removeFirstOrLastSection(boolean existPreviousSection, boolean existLaterSection) {
@@ -124,37 +124,37 @@ public class Sections {
         }
     }
 
-    private void removeMiddleSection(boolean isExistPreviousSection, boolean isExistLaterSection, Long stationId) {
+    private void removeMiddleSection(boolean isExistPreviousSection, boolean isExistLaterSection, Station station) {
         if (isExistPreviousSection && isExistLaterSection) {
-            deleteSection(stationId);
+            deleteSection(station);
         }
     }
 
-    private void deleteSection(Long stationId) {
-        final Section previousSection = findPreviousSection(stationId);
-        final Section laterSection = findLaterSection(stationId);
+    private void deleteSection(Station station) {
+        final Section previousSection = findPreviousSection(station);
+        final Section laterSection = findLaterSection(station);
 
         final int distance = previousSection.getDistance() + laterSection.getDistance();
-        final Section newSection = new Section(previousSection.getLineId(), previousSection.getUpStationId(),
-                laterSection.getDownStationId(), distance);
+        final Section newSection = new Section(previousSection.getLine(), previousSection.getUpStation(),
+                laterSection.getDownStation(), distance);
 
         sections.add(newSection);
         sections.remove(previousSection);
         sections.remove(laterSection);
     }
 
-    private Section findPreviousSection(Long stationId) {
+    private Section findPreviousSection(Station station) {
         return sections.stream()
-                .filter(section -> section.isSameDownStation(stationId))
+                .filter(section -> section.isSameDownStation(station))
                 .findAny()
                 .orElseThrow(() -> new IllegalSectionException(
                         "삭제 이후 연결할 상행역이 존재하지 않아 구간 삭제가 불가능합니다."
                 ));
     }
 
-    private Section findLaterSection(Long stationId) {
+    private Section findLaterSection(Station station) {
         return sections.stream()
-                .filter(section -> section.isSameUpStation(stationId))
+                .filter(section -> section.isSameUpStation(station))
                 .findAny()
                 .orElseThrow(() -> new IllegalSectionException(
                         "삭제 이후연결할 하행역이 존재하지 않아 구간 삭제가 불가능합니다."
@@ -180,33 +180,33 @@ public class Sections {
 
     private Section findFirstSection(List<Section> copySections) {
         return copySections.stream()
-                .filter(section -> isFirst(copySections, section.getUpStationId()))
+                .filter(section -> isFirst(copySections, section.getUpStation()))
                 .findAny()
                 .orElseThrow();
     }
 
-    private boolean isFirst(List<Section> copySections, Long upStationId) {
+    private boolean isFirst(List<Section> copySections, Station upStation) {
         return copySections.stream()
-                .noneMatch(section -> upStationId.equals(section.getDownStationId()));
+                .noneMatch(section -> upStation.equals(section.getDownStation()));
     }
 
     private void concatenateSection(List<Section> sortedSections, List<Section> copySections) {
         while (sortedSections.size() != copySections.size()) {
             final Section lastSection = sortedSections.get(sortedSections.size() - 1);
-            final Long lastDownStationId = lastSection.getDownStationId();
+            final Station lastDownStation = lastSection.getDownStation();
 
-            checkAndConcatenate(sortedSections, copySections, lastDownStationId);
+            checkAndConcatenate(sortedSections, copySections, lastDownStation);
         }
     }
 
-    private void checkAndConcatenate(List<Section> sortedSections, List<Section> copySections, Long lastDownStationId) {
+    private void checkAndConcatenate(List<Section> sortedSections, List<Section> copySections, Station lastDownStation) {
         for (Section section : copySections) {
-            moveOneByOne(sortedSections, lastDownStationId, section);
+            moveOneByOne(sortedSections, lastDownStation, section);
         }
     }
 
-    private void moveOneByOne(List<Section> sortedSections, Long lastDownStationId, Section section) {
-        if (section.getUpStationId().equals(lastDownStationId)) {
+    private void moveOneByOne(List<Section> sortedSections, Station lastDownStation, Section section) {
+        if (section.getUpStation().equals(lastDownStation)) {
             sortedSections.add(section);
         }
     }
