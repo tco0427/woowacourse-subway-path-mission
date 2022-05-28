@@ -31,10 +31,9 @@ public class StationService {
 
     public StationResponse save(StationRequest request) {
         final Station station = new Station(request.getName());
-
         final Station savedStation = stationDao.save(station);
 
-        return new StationResponse(savedStation.getId(), savedStation.getName());
+        return new StationResponse(savedStation);
     }
 
     @Transactional(readOnly = true)
