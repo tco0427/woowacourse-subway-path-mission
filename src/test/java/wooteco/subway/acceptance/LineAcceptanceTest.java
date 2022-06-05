@@ -124,12 +124,11 @@ class LineAcceptanceTest extends AcceptanceTest {
         // when
         final ExtractableResponse<Response> response = AcceptanceFixture.delete("/lines/" + savedId);
         final ExtractableResponse<Response> getResponse = AcceptanceFixture.get("/lines");
-
-
+        
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.NO_CONTENT.value());
         assertThat(getResponse.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(extractIds(getResponse)).isEmpty();
+        assertThat(extractIds(getResponse)).doesNotContain(Long.valueOf(savedId));
     }
 
     private String getSavedIdFromInitLine() {
